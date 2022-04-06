@@ -85,7 +85,7 @@ device, you can run `ExampleDevice.shutdown/0`. Ths will gracefully shutdown the
 device and save the metrics in your your system's temp directory so they can be
 restored on future runs. This is a good way to accumulate metrics over time.
 
-#### Exporting data from example device
+### Exporting data from example device
 
 Skip to the next section if you're trying to pull data from a Nerves device.
 
@@ -104,7 +104,7 @@ YYYYMMDDHHMMSS-metrics.mbf
 
 This will return `{:ok, path_to_generated_file}`.
 
-#### Exporting from a running Nerves device
+### Exporting from a running Nerves device
 
 If you have a Nerves device that has Mobius running (at least `v0.4.0`) you can
 export the data via ssh, `Mobius.Exports.mbf/1`, and `sftp`
