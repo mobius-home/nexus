@@ -86,7 +86,7 @@ defmodule Nexus.MixProject do
       source_ref: "v#{@version}",
       skip_undefined_reference_warnings_on: ["CHANGELOG.md"],
       groups_for_extras: groups_for_extras(),
-      assets: "doc_assets",
+      assets: "guides/assets",
       groups_for_modules: [
         Core: [
           Nexus,
