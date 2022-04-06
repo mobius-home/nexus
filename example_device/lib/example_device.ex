@@ -7,7 +7,7 @@ defmodule ExampleDevice do
   Export the Mobius metrics to your system's `tmp` directory
   """
   def export() do
-    Mobius.Exports.mbf(out_dir: System.tmp_dir!())
+    Mobius.Exports.mbf(out_dir: "/tmp")
   end
 
   @doc """
