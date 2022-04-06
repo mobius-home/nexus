@@ -1,0 +1,9 @@
+<h1>Products</h1>
+
+<p>
+  <%= link "Add Product", to: Routes.product_path(@conn, :new) %>
+</p>
+
+<%= for product <- @products do %>
+  <p><%= link product.name, to: Routes.product_path(@conn, :show, product.slug) %></p>
+<% end %>

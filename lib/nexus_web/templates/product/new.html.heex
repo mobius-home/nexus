@@ -1,0 +1,9 @@
+<h1>Add a Product</h1>
+
+<%= form_for @product, Routes.product_path(@conn, :create), fn f -> %>
+
+  <%= text_input f, :name, placeholder: "My new product" %>
+  <%= error_tag f, :name %>
+
+  <%= submit "Add" %>
+<% end %>

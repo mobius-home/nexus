@@ -1,0 +1,30 @@
+version: "3"
+
+volumes:
+  timescale_data:
+    driver: local
+  timescale_data_test:
+    driver: local
+
+services:
+  timescaledb:
+    image: timescale/timescaledb:latest-pg12
+    ports:
+      - "5591:5432"
+    volumes:
+      - timescale_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: db
+      POSTGRES_PASSWORD: db
+      POSTGRES_DB: db
+
+  db_test:
+    image: timescale/timescaledb:latest-pg12
+    ports:
+      - "5592:5432"
+    volumes:
+      - timescale_data_test:/var/lib/postgresql/test/data
+    environment:
+      POSTGRES_USER: db
+      POSTGRES_PASSWORD: db
+      POSTGRES_DB: db

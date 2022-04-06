@@ -1,0 +1,9 @@
+<h1><%= @product.name %></h1>
+
+<p>
+  <%= link "Add device", to: Routes.product_device_path(@conn, :new, @product.slug) %>
+</p>
+
+<%= for d <- @devices do %>
+  <p><%= link d.serial_number, to: Routes.product_device_path(@conn, :show, @product.slug, d.slug) %></p>
+<% end %>

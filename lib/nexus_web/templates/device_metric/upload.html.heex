@@ -1,0 +1,10 @@
+<h1>Upload Metrics File</h1>
+
+
+<%= form_for @changeset, Routes.device_metric_path(@conn, :upload, @product.slug, @device.slug),
+  [multipart: true], fn f -> %>
+
+  <%= file_input f, :filename %>
+
+  <%= submit "Upload" %>
+<% end %>

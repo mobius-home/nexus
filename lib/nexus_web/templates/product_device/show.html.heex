@@ -1,0 +1,25 @@
+<h1><%= @device.serial_number %></h1>
+
+<%= link "Import Metrics", to: Routes.device_metric_path(@conn, :new_upload, @product.slug, @device.slug) %>
+
+<%= if Enum.empty?(@product.metrics) do %>
+  <p>There's no metrics reporting or configured for this product yet</p>
+<% else %>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+      </tr>
+    </thead>
+    <tbody>
+      <%= for m <- @product.metrics do %>
+        <tr>
+          <td><%= link m.name, to: Routes.device_metric_path(@conn, :show, @product.slug, @device.slug, m.slug) %></td>
+          <td><%= m.type %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
+

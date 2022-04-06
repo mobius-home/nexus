@@ -1,0 +1,8 @@
+<h1>Add Device</h1>
+
+<%= form_for @device, Routes.product_device_path(@conn, :create, @product_slug), fn f -> %>
+  <%= text_input f, :serial_number, placeholder: "dev1234" %>
+
+  <%= submit "Add" %>
+<% end %>
+

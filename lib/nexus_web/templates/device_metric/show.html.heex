@@ -1,0 +1,19 @@
+<h1><%= @metric.name %></h1>
+<p><%= @metric.type %></p>
+
+<%= if Enum.empty?(@measurements) do %>
+  <p>No measurements reported during the time frame</p>
+<% else %>
+  <div {[data_graph: @graph, id: "graph"]} >
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vega@5.21.0"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-lite@5.2.0"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.20.5"></script>
+
+  <script>
+    const json = JSON.parse(document.getElementById("graph").dataset.graph);
+
+    vegaEmbed("#graph", json);
+  </script>
+<% end %>
