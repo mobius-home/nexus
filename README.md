@@ -4,8 +4,9 @@ Nexus is a centralized server for collecting IoT metric data for Elixir/Nerves
 devices using [Mobius](https://hexdocs.pm/mobius/readme.html).
 
 ### ⚠️ Warning
-This project is in the develop stage. All APIs and UI may change without warning
-and no guarantees are given about stability. Do not use it in production. 
+This project is in the development stage. All APIs and UI may change without
+warning and no guarantees are given about stability. Do not use it in
+production. 
 
 Nexus tries to keep the `ex_docs` updated and well organized, so run `mix docs`
 to generate and see how to work with Nexus.
