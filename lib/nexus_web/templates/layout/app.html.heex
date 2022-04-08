@@ -22,7 +22,7 @@
         </div>
       </div> <!-- main nav -->
 
-      <div class="pt-5">
+      <div class="py-5 border-b">
         <div class="px-7 w-full">
           <p class="text-gray-600 tracking-wide mb-4"><%= user_full_name(@current_user) %></p>
 
@@ -31,12 +31,21 @@
            method: :delete,
            class: "block font-extralight"
           %>
-
-
         </div>
       </div> <!-- account nav -->
 
+      <div class="pt-5">
+        <div class="px-7 w-full">
+          <%= link "Docs",
+           to: "https://github.com/mobius-home/nexus/tree/main/guides",
+           class: "block font-extralight"
+          %>
+        </div>
+      </div> <!-- docs nav -->
+
     </div> <!-- side nav -->
+
+    <!-- main content -->
     <div class="pl-[15.5rem] pr-10 pt-5">
       <div class="flex justify-end mb-10">
         <div class="bg-violet-600 text-white pt-1 pb-1 pl-5 pr-5 rounded">
