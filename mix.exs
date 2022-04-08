@@ -73,7 +73,12 @@ defmodule Nexus.MixProject do
       setup: ["deps.get", "ecto.setup"],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
-      test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
+      test: [
+        "ecto.create --quiet",
+        "ecto.migrate --quiet",
+        "run priv/repo/test_seeds.exs",
+        "test"
+      ],
       "assets.deploy": ["esbuild default --minify", "phx.digest"]
     ]
   end
@@ -90,12 +95,17 @@ defmodule Nexus.MixProject do
       groups_for_modules: [
         Core: [
           Nexus,
+          Nexus.Accounts,
           Nexus.Products,
           Nexus.Products.MetricImports,
           Nexus.Repo,
           Nexus.Mailer
         ],
         Schemas: [
+          Nexus.Accounts.User,
+          Nexus.Accounts.UserToken,
+          Nexus.Accounts.UserRole,
+          Nexus.Accounts.UserMailer,
           Nexus.Products.Device,
           Nexus.Products.Label,
           Nexus.Products.Metric,
@@ -109,14 +119,16 @@ defmodule Nexus.MixProject do
           NexusWeb.ProductController,
           NexusWeb.ProductDeviceController,
           NexusWeb.ProductMetricController,
-          NexusWeb.DeviceMetricController
+          NexusWeb.DeviceMetricController,
+          NexusWeb.UserSessionController
         ],
         "Web Views": [
           NexusWeb.PageView,
           NexusWeb.ProductView,
           NexusWeb.ProductDeviceView,
           NexusWeb.ProductMetricView,
-          NexusWeb.DeviceMetricView
+          NexusWeb.DeviceMetricView,
+          NexusWeb.UserSessionView
         ],
         "Web Request Params": [
           NexusWeb.RequestParams,
@@ -126,10 +138,12 @@ defmodule Nexus.MixProject do
           NexusWeb.RequestParams.MetricSlugParams,
           NexusWeb.RequestParams.NewProductParams,
           NexusWeb.RequestParams.ProductSlugParams,
-          NexusWeb.RequestParams.DeviceMetricUploadParams
+          NexusWeb.RequestParams.DeviceMetricUploadParams,
+          NexusWeb.RequestParams.TokenParams
         ],
         "Web Core": [
           NexusWeb,
+          NexusWeb.UserAuth,
           NexusWeb.Endpoint,
           NexusWeb.ErrorHelpers,
           NexusWeb.ErrorView,

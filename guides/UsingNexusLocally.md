@@ -37,15 +37,31 @@ mix ecto.setup
 
 This will create the database, run the migrations, and run seeds.
 
-### Run the server
-
-To run the server you can run
+After the seeds you should see a message about how to login as the admin user:
 
 ```
+======================= FINISH SET UP INSTRUCTION BELOW =====================
+
+#########################
+## Login as admin user ##
+#########################
+
+Run the phoenix server:
+
 iex -S mix phx.server
+
+And navigate to
+
+http://localhost:4000/users/login/<some_token>
 ```
 
-You should now have the server running locally!
+Start the server and follow that link and you will be authenticated as the
+admin user.
+
+If you need to authenticate again you can go to `http://localhost:400/` and
+enter the email of the user you want to authenticate as. After you 
+successfully do that navigate to `http://localhost:4000/dev/mailbox` and the first
+E-Mail should contain the authentication link.
 
 ## Get metrics and conducting uploads
 

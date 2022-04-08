@@ -1,5 +1,6 @@
 defmodule NexusWeb.Router do
   use NexusWeb, :router
+  import NexusWeb.UserAuth
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -8,6 +9,7 @@ defmodule NexusWeb.Router do
     plug :put_root_layout, {NexusWeb.LayoutView, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug :fetch_current_user
   end
 
   pipeline :product do
@@ -25,7 +27,19 @@ defmodule NexusWeb.Router do
   scope "/", NexusWeb do
     pipe_through :browser
 
-    get "/", PageController, :index
+    get "/", UserSessionController, :new
+    post "/users/login", UserSessionController, :create_magic_link
+    delete "/users/log-out", UserSessionController, :delete
+  end
+
+  scope "/", NexusWeb do
+    pipe_through [:browser, :redirect_if_user_is_authenticated]
+
+    get "/users/login/:token", UserSessionController, :create
+  end
+
+  scope "/", NexusWeb do
+    pipe_through [:browser, :require_authenticated_user]
 
     get "/products", ProductController, :index
     post "/products", ProductController, :create
