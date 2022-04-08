@@ -35,7 +35,7 @@ defmodule NexusWeb.UserSessionController do
            ) do
       conn
       |> put_flash(:info, "Please check your email for login instructions")
-      |> render("new.html", changeset: Accounts.user_changeset())
+      |> render("new.html", changeset: nil)
     else
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "new.html", changeset: changeset)
