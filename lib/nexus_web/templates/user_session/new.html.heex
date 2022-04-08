@@ -1,0 +1,8 @@
+
+
+<%= form_for @changeset, Routes.user_session_path(@conn, :create_magic_link), [as: :login_request], fn f -> %>
+  <%= text_input f, :email, placeholder: "myemail@provider.com" %>
+  <%= error_tag f, :email %>
+
+  <%= submit "Request login" %>
+<% end %>
