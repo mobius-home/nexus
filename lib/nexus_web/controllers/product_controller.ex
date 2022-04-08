@@ -19,7 +19,6 @@ defmodule NexusWeb.ProductController do
       redirect(conn, to: Routes.product_path(conn, :show, new_product.slug))
     else
       {:error, changeset} ->
-        IO.inspect(changeset)
         render(conn, "new.html", product: changeset)
     end
   end

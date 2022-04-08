@@ -194,6 +194,7 @@ defmodule Nexus.Accounts do
         select: user
 
     Repo.one(query)
+    |> Repo.preload(:role)
   end
 
   @spec get_role_by_name(UserRole.name()) :: UserRole.t() | nil

@@ -149,6 +149,7 @@ defmodule Nexus.AccountsTest do
 
     test "query user by session token - good token", %{user: user} do
       token = Accounts.create_user_session_token(user)
+      user = Repo.preload(user, :role)
 
       assert user == Accounts.get_user_by_session_token(token)
     end

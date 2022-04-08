@@ -41,7 +41,9 @@ defmodule NexusWeb.UserSessionController do
       |> render("new.html", changeset: nil)
     else
       {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, "new.html", changeset: changeset)
+        conn
+        |> put_layout({NexusWeb.LayoutView, "blank.html"})
+        |> render("new.html", changeset: changeset)
 
       nil ->
         conn

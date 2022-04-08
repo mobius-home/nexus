@@ -51,11 +51,12 @@ end
 ### Create admin user
 
 user_email = "admin@nexuslocal.com"
+admin_role = Accounts.get_role_by_name("admin")
 
 admin_user =
   case Accounts.get_user_by_email(user_email) do
     nil ->
-      {:ok, user} = Accounts.add_user(user_email, "Agent", "Mobius")
+      {:ok, user} = Accounts.add_user(user_email, "Agent", "Mobius", role: admin_role)
       user
 
     user ->
