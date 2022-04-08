@@ -1,5 +1,30 @@
 <main>
   <p class="hidden" role="alert"><%= get_flash(@conn, :info) %></p>
   <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
-  <%= @inner_content %>
+
+  <div class="h-screen">
+    <div class="fixed h-full bg-white w-52 drop-shadow-sm">
+      <div class="w-full border-b pt-7 pb-7 text-center">
+        <h1 class="text-2xl font-extralight tracking-wider text-violet-500">Nexus</h1>
+      </div>
+      <div class="border-b pb-7 pt-7">
+        <p><%= link "Products", to: Routes.product_path(@conn, :index) %></p>
+      </div> <!-- main nav -->
+      <div>
+        <p>Jack Sparrow</p>
+
+        <p><%= link "Log out", to: Routes.user_session_path(@conn, :delete), method: :delete %></p>
+      </div> <!-- account nav -->
+    </div> <!-- side nav -->
+    <div class="pl-[15.5rem] pr-10 pt-5">
+      <div class="flex justify-end mb-10">
+        <div class="bg-violet-600 text-white pt-1 pb-1 pl-5 pr-5 rounded">
+          <%= link "Add Product", to: Routes.product_path(@conn, :new) %>
+        </div>
+      </div>
+
+    <%= @inner_content %>
+  </div> <!-- main content -->
+</div> <!-- wrapper -->
+
 </main>

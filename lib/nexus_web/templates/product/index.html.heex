@@ -1,12 +1,3 @@
-<h1>Products</h1>
-
-<p>
-  <%= link "Add Product", to: Routes.product_path(@conn, :new) %>
-</p>
-
-<p><%= link "Log out", to: Routes.user_session_path(@conn, :delete), method: :delete %></p>
-<hr>
-
 <%= for product <- @products do %>
   <p><%= link product.name, to: Routes.product_path(@conn, :show, product.slug) %></p>
 <% end %>

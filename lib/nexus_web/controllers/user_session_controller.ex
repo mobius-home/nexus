@@ -12,7 +12,10 @@ defmodule NexusWeb.UserSessionController do
 
   def new(conn, _params) do
     changeset = Accounts.user_changeset()
-    render(conn, "new.html", changeset: changeset)
+
+    conn
+    |> put_layout({NexusWeb.LayoutView, "blank.html"})
+    |> render("new.html", changeset: changeset)
   end
 
   def create(conn, params) do
@@ -34,7 +37,7 @@ defmodule NexusWeb.UserSessionController do
              &Routes.user_session_url(conn, :create, &1)
            ) do
       conn
-      |> put_flash(:info, "Please check your email for login instructions")
+      |> put_layout({NexusWeb.LayoutView, "blank.html"})
       |> render("new.html", changeset: nil)
     else
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -42,8 +45,8 @@ defmodule NexusWeb.UserSessionController do
 
       nil ->
         conn
-        |> put_flash(:info, "Please check your email for login instructions")
-        |> render("new.html", changeset: Accounts.user_changeset())
+        |> put_layout({NexusWeb.LayoutView, "blank.html"})
+        |> render("new.html", changeset: nil)
     end
   end
 

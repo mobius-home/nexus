@@ -80,7 +80,9 @@ defmodule NexusWeb.UserSessionControllerTest do
           "login_request" => %{"email" => user.email}
         })
 
-      assert get_flash(conn, :info) =~ "Please check your email for login instructions"
+      response = html_response(conn, 200)
+
+      assert response =~ "See Email for login information"
     end
 
     test "handles unknown user request", %{conn: conn} do
@@ -89,7 +91,9 @@ defmodule NexusWeb.UserSessionControllerTest do
           "login_request" => %{"email" => "nota@user.com"}
         })
 
-      assert get_flash(conn, :info) =~ "Please check your email for login instructions"
+      response = html_response(conn, 200)
+
+      assert response =~ "See Email for login information"
     end
   end
 end
