@@ -26,7 +26,15 @@ config :nexus, NexusWeb.Endpoint,
   secret_key_base: "OMI/JVEzaCdvFWJIFm1CQzccE2MkllQQPcgHdOhQLeSi6YXPZumE+oOn6i8rFl/n",
   watchers: [
     # Start the esbuild watcher by calling Esbuild.install_and_run(:default, args)
-    esbuild: {Esbuild, :install_and_run, [:default, ~w(--sourcemap=inline --watch)]}
+    esbuild: {Esbuild, :install_and_run, [:default, ~w(--sourcemap=inline --watch)]},
+    npx: [
+      "tailwindcss",
+      "--input=css/app.css",
+      "--output=../priv/static/assets/app.css",
+      "--postcss",
+      "--watch",
+      cd: Path.expand("../assets", __DIR__)
+    ]
   ]
 
 # ## SSL Support

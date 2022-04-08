@@ -79,7 +79,11 @@ defmodule Nexus.MixProject do
         "run priv/repo/test_seeds.exs",
         "test"
       ],
-      "assets.deploy": ["esbuild default --minify", "phx.digest"]
+      "assets.deploy": [
+        "cmd --cd assets npm run deploy",
+        "esbuild default --minify",
+        "phx.digest"
+      ]
     ]
   end
 

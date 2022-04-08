@@ -19,6 +19,7 @@ to generate and see how to work with Nexus.
 * Elixir 1.12+
 * Erlang OTP 24+
 * Elixir Phoenix 1.6+
+* Node 17+
 
 ### Setup
 
