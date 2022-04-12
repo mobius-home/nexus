@@ -41,6 +41,14 @@ defmodule Nexus.Accounts do
   end
 
   @doc """
+  Get all users on the server
+  """
+  @spec users() :: [User.t()]
+  def users() do
+    Repo.all(User)
+  end
+
+  @doc """
   Add a user to the server
   """
   @spec add_user(User.email(), User.first_name(), User.last_name(), [add_user_opt()]) ::
@@ -197,9 +205,20 @@ defmodule Nexus.Accounts do
     |> Repo.preload(:role)
   end
 
+  @doc """
+  Get a role by the role name
+  """
   @spec get_role_by_name(UserRole.name()) :: UserRole.t() | nil
   def get_role_by_name(role_name) do
     Repo.get_by(UserRole, name: role_name)
+  end
+
+  @doc """
+  Get all roles
+  """
+  @spec get_roles() :: [UserRole.t()]
+  def get_roles() do
+    Repo.all(UserRole)
   end
 
   @doc """

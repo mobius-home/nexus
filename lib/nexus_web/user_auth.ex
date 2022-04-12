@@ -17,6 +17,13 @@ defmodule NexusWeb.UserAuth do
   alias Nexus.Accounts
 
   def log_in_user(conn, user) do
+    conn
+    |> set_logged_in_session(user)
+    |> redirect(to: "/products")
+  end
+
+  @doc false
+  def set_logged_in_session(conn, user) do
     token = Accounts.create_user_session_token(user)
 
     conn
@@ -24,7 +31,6 @@ defmodule NexusWeb.UserAuth do
     |> put_session(:user_token, token)
     |> put_session(:live_socket_id, "users_sessions:#{Base.url_encode64(token)}")
     |> write_remember_me_cookie(token)
-    |> redirect(to: "/products")
   end
 
   defp write_remember_me_cookie(conn, token) do
@@ -122,6 +128,16 @@ defmodule NexusWeb.UserAuth do
       |> halt()
     else
       conn
+    end
+  end
+
+  def require_admin_user(conn, _opts) do
+    if conn.assigns[:current_user].role.name == "admin" do
+      conn
+    else
+      conn
+      |> redirect(to: "/products")
+      |> halt()
     end
   end
 end

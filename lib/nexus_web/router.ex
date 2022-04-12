@@ -66,6 +66,13 @@ defmodule NexusWeb.Router do
         get "/:device_slug/metrics/:metric_slug", DeviceMetricController, :show
       end
     end
+
+    scope "/" do
+      pipe_through [:require_admin_user]
+      get "/users", ServerUserController, :index
+      post "/users", ServerUserController, :create
+      get "/users/new", ServerUserController, :new
+    end
   end
 
   # Other scopes may use custom stacks.

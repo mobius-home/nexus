@@ -1,0 +1,44 @@
+<div class="w-full bg-white min-h-[650px] drop-shadow-sm rounded pt-10">
+  <div class="px-10">
+    <div class="border-b pb-2">
+      <h1 class="text-xl tracking-wider text-gray-500">New user</h1>
+    </div>
+
+    <%= form_for @changeset, Routes.server_user_path(@conn, :create), [as: :user], fn f -> %>
+      <div class="my-5">
+        <%= text_input f,
+          :first_name,
+          placeholder: "First name",
+          class: "shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker" %>
+        <%= error_tag f, :first_name, "text-red-400 font-light" %>
+      </div>
+
+      <div class="my-5">
+        <%= text_input f,
+          :last_name,
+          placeholder: "Last name",
+          class: "shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker" %>
+
+        <%= error_tag f, :last_name, "text-red-400 font-light" %>
+      </div>
+
+      <div class="my-5">
+        <%= text_input f,
+          :email,
+          placeholder: "Email address",
+          class: "shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker" %>
+
+        <%= error_tag f, :email, "text-red-400 font-light" %>
+      </div>
+
+
+      <div class="pt-6 flex justify-end">
+        <div
+          class="text-violet-500 pt-1 pb-1 pl-5 pr-5 rounded border border-violet-500 hover:border-violet-700 hover:text-violet-700 hover:drop-shadow-sm hover:bg-violet-700 hover:text-white"
+        >
+          <%= submit "Add", class: "font-light" %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

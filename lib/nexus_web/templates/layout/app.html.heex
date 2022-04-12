@@ -3,7 +3,7 @@
   <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
 
   <div class="h-screen">
-    <div class="fixed h-full bg-white w-52 drop-shadow-sm">
+    <div class="fixed h-full bg-white w-60 drop-shadow-sm">
 
       <div class="w-full border-b pt-7 pb-7 text-center">
         <h1 class="text-2xl font-extralight tracking-widest text-violet-500">Nexus</h1>
@@ -17,7 +17,10 @@
           %>
 
           <%= if user_admin?(@current_user) do %>
-            <p class="font-extralight">Server Admin</p>
+            <%= link "Users",
+              to: Routes.server_user_path(@conn, :index),
+              class: "block font-extralight mb-2"
+            %>
           <% end %>
         </div>
       </div> <!-- main nav -->
@@ -46,7 +49,7 @@
     </div> <!-- side nav -->
 
     <!-- main content -->
-    <div class="pl-[15.5rem] pr-10 pt-5">
+    <div class="pl-[17.5rem] pr-10 pt-5">
       <div class="flex justify-end mb-10">
         <div class="bg-violet-600 text-white pt-1 pb-1 pl-5 pr-5 rounded">
           <%= link "Add Product", to: Routes.product_path(@conn, :new) %>
