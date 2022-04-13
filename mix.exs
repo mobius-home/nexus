@@ -9,7 +9,7 @@ defmodule Nexus.MixProject do
       version: "0.1.0",
       elixir: "~> 1.12",
       elixirc_paths: elixirc_paths(Mix.env()),
-      compilers: [:gettext] ++ Mix.compilers(),
+      compilers: [:gettext] ++ Mix.compilers() ++ [:surface],
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps(),
@@ -58,6 +58,8 @@ defmodule Nexus.MixProject do
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
       {:ecto_timescaledb, "~> 0.10.0"},
       {:vega_lite, "~> 0.1.3"},
+      {:surface, "~> 0.7.1"},
+      {:surface_formatter, "~> 0.7.5"},
       {:mobius, "~> 0.4.0"}
     ]
   end
@@ -118,6 +120,9 @@ defmodule Nexus.MixProject do
           Nexus.Products.Metric.Measurement,
           Nexus.Products.Tag
         ],
+        "Live Views": [
+          NexusWeb.RequestLoginLive
+        ],
         "Web Controllers": [
           NexusWeb.PageController,
           NexusWeb.ProductController,
@@ -134,8 +139,10 @@ defmodule Nexus.MixProject do
           NexusWeb.DeviceMetricView,
           NexusWeb.UserSessionView
         ],
-        "Web Request Params": [
+        "Web Params": [
           NexusWeb.RequestParams,
+          NexusWeb.Params,
+          NexusWeb.Params.RequestLogin,
           NexusWeb.RequestParams.CreateProductDeviceParams,
           NexusWeb.RequestParams.CreateProductMetricParams,
           NexusWeb.RequestParams.GetProductDeviceParams,

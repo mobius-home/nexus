@@ -8,7 +8,7 @@ defmodule NexusWeb.UserSessionController do
   alias Nexus.Accounts
   alias Nexus.Accounts.User
   alias NexusWeb.{RequestParams, UserAuth}
-  alias NexusWeb.RequestParams.{RequestLoginParams, TokenParams}
+  alias NexusWeb.RequestParams.TokenParams
 
   def new(conn, _params) do
     changeset = Accounts.user_changeset()
@@ -24,31 +24,7 @@ defmodule NexusWeb.UserSessionController do
       UserAuth.log_in_user(conn, user)
     else
       _error ->
-        redirect(conn, to: Routes.user_session_path(conn, :new))
-    end
-  end
-
-  def create_magic_link(conn, params) do
-    with {:ok, params} <- RequestParams.bind(%RequestLoginParams{}, params),
-         %User{} = user <- Accounts.get_user_by_email(params.email),
-         {:ok, _email} <-
-           Accounts.send_magic_email_for_user(
-             user,
-             &Routes.user_session_url(conn, :create, &1)
-           ) do
-      conn
-      |> put_layout({NexusWeb.LayoutView, "blank.html"})
-      |> render("new.html", changeset: nil)
-    else
-      {:error, %Ecto.Changeset{} = changeset} ->
-        conn
-        |> put_layout({NexusWeb.LayoutView, "blank.html"})
-        |> render("new.html", changeset: changeset)
-
-      nil ->
-        conn
-        |> put_layout({NexusWeb.LayoutView, "blank.html"})
-        |> render("new.html", changeset: nil)
+        redirect(conn, to: Routes.live_path(conn, NexusWeb.RequestLoginLive))
     end
   end
 

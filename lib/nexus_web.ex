@@ -27,6 +27,15 @@ defmodule NexusWeb do
     end
   end
 
+  def surface_view do
+    quote do
+      use Surface.LiveView,
+        layout: {NexusWeb.LayoutView, "live.html"}
+
+      unquote(view_helpers())
+    end
+  end
+
   def view do
     quote do
       use Phoenix.View,
@@ -39,6 +48,7 @@ defmodule NexusWeb do
 
       # Include shared imports and aliases for views
       unquote(view_helpers())
+      import Surface
     end
   end
 

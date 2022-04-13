@@ -27,7 +27,7 @@ defmodule NexusWeb.Router do
   scope "/", NexusWeb do
     pipe_through :browser
 
-    get "/", UserSessionController, :new
+    live "/", RequestLoginLive
     post "/users/login", UserSessionController, :create_magic_link
     delete "/users/log-out", UserSessionController, :delete
   end
