@@ -31,19 +31,15 @@ defmodule NexusWeb.ProductLive do
   def render(assigns) do
     ~F"""
     <div class="w-full bg-white rounded drop-shadow-sm min-h-[700px] p-8 filter-none">
-      <div class="border-b">
-        <h2 class="pb-2 text-xl">{@product.name}</h2>
-      </div>
+      <div class="border-b pb-2 flex justify-between">
+        <h2 class="text-xl pt-[14px]">{@product.name}</h2>
 
-      <div class="flex justify-end">
-        <div class="mt-7">
           <LivePatch
             to={Routes.product_path(@socket, :add_device, @product.slug)}
-            class="text-violet-600 border border-violet-600 py-2 px-5 rounded font-light hover:bg-violet-600 hover:text-white"
+            class="text-violet-600 border border-violet-600 py-2 px-5 rounded font-light hover:bg-violet-600 hover:text-white h-[42px]"
           >
             Add Device
           </LivePatch>
-        </div>
       </div>
 
       <table class="table-auto w-full mt-10">
