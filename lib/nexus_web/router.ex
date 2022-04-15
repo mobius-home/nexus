@@ -48,6 +48,8 @@ defmodule NexusWeb.Router do
 
       live "/:product_slug", ProductLive
       live "/:product_slug/add-device", ProductLive, :add_device
+      live "/:product_slug/devices", ProductLive, :devices
+      live "/:product_slug/metrics", ProductLive, :metrics
 
       get "/:product_slug/metrics/new", ProductMetricController, :new
       post "/:product_slug/metrics", ProductMetricController, :create

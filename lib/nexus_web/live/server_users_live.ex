@@ -132,7 +132,6 @@ defmodule NexusWeb.ServerUsersLive do
     |> Ecto.Changeset.cast(params, fields)
     |> Ecto.Changeset.validate_required(fields)
     |> Ecto.Changeset.apply_action(:insert)
-    |> IO.inspect()
   end
 
   defp full_name(user) do

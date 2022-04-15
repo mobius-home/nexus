@@ -4,7 +4,7 @@ defmodule NexusWeb.ProductLive do
   alias Nexus.Products
   alias NexusWeb.Params
   alias NexusWeb.Params.{ProductURLParams, NewDevice}
-  alias NexusWeb.Components.Modal
+  alias NexusWeb.Components.{DeviceTable, Modal}
   alias Surface.Components.{Form, LivePatch}
   alias Surface.Components.Form.{ErrorTag, TextInput, Submit}
 
@@ -41,22 +41,22 @@ defmodule NexusWeb.ProductLive do
         </LivePatch>
       </div>
 
-      <table class="table-auto w-full mt-10">
-        <thead>
-          <tr>
-            <th class="text-left border-b-2 font-medium text-sm p-4 pb-2 text-gray-600">Serial number</th>
-            <th class="text-left border-b-2 font-medium text-sm p-4 pb-2 text-gray-600">Last reported</th>
-          </tr>
-        </thead>
-        <tbody id="devices" phx-update="prepend">
-          {#for d <- @devices}
-            <tr id={d.serial_number} class="even:bg-gray-100 font-light text-gray-500">
-              <td class="p-4">{d.serial_number}</td>
-              <td class="p-4"></td>
-            </tr>
-          {/for}
-        </tbody>
-      </table>
+      <div class="flex justify-start mt-5">
+        <LivePatch class={sub_nav_item_class(@live_action, "overview")} to={Routes.live_path(@socket, __MODULE__, @product.slug)}>Overview</LivePatch>
+        <LivePatch class={sub_nav_item_class(@live_action, "devices")} to={Routes.product_path(@socket, :devices, @product.slug)}>Devices</LivePatch>
+        <LivePatch class={sub_nav_item_class(@live_action, "metrics")} to={Routes.product_path(@socket, :metrics, @product.slug)}>Metrics</LivePatch>
+      </div>
+
+      <div class="mt-10">
+        {#case @live_action}
+          {#match :devices}
+            <DeviceTable id="device-table" product={@product} />
+          {#match :metrics}
+            <p>Make a metrics table to show the types of metrics the product supports</p>
+          {#match _}
+            <p>This is where some product level metrics can be shown</p>
+        {/case}
+      </div>
 
       {#if @live_action == :add_device}
         <Modal
@@ -106,5 +106,21 @@ defmodule NexusWeb.ProductLive do
       |> update(:devices, fn devices -> [device | devices] end)
 
     {:noreply, socket}
+  end
+
+  def sub_nav_item_class(nil, "overview") do
+    "mr-4 text-sm font-bold"
+  end
+
+  def sub_nav_item_class(:metrics, "metrics") do
+    "mr-4 text-sm font-bold"
+  end
+
+  def sub_nav_item_class(:devices, "devices") do
+    "mr-4 text-sm font-bold"
+  end
+
+  def sub_nav_item_class(_, _) do
+    "mr-4 text-sm"
   end
 end
