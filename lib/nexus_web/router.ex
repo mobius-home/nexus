@@ -43,10 +43,6 @@ defmodule NexusWeb.Router do
 
     live "/products", ProductsLive
 
-    # get "/products", ProductController, :index
-    # post "/products", ProductController, :create
-    # get "/products/new", ProductController, :new
-
     scope "/products" do
       pipe_through [:product]
 
