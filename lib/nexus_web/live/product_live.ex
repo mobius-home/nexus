@@ -33,12 +33,12 @@ defmodule NexusWeb.ProductLive do
       <div class="border-b pb-2 flex justify-between">
         <h2 class="text-xl pt-[14px]">{@product.name}</h2>
 
-          <LivePatch
-            to={Routes.product_path(@socket, :add_device, @product.slug)}
-            class="text-violet-600 border border-violet-600 py-2 px-5 rounded font-light hover:bg-violet-600 hover:text-white h-[42px]"
-          >
-            Add Device
-          </LivePatch>
+        <LivePatch
+          to={Routes.product_path(@socket, :add_device, @product.slug)}
+          class="text-violet-600 border border-violet-600 py-2 px-5 rounded font-light hover:bg-violet-600 hover:text-white h-[42px]"
+        >
+          Add Device
+        </LivePatch>
       </div>
 
       <table class="table-auto w-full mt-10">

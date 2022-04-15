@@ -72,9 +72,8 @@ defmodule NexusWeb.Router do
 
     scope "/" do
       pipe_through [:require_admin_user]
-      get "/users", ServerUserController, :index
-      post "/users", ServerUserController, :create
-      get "/users/new", ServerUserController, :new
+      live "/users", ServerUsersLive
+      live "/users/new", ServerUsersLive, :add_user
     end
   end
 

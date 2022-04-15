@@ -16,14 +16,14 @@
 
       <div class="border-b py-5">
         <div class="px-7 w-full">
-          <%= link "Products",
+          <%= live_redirect "Products",
             to: Routes.live_path(@socket, NexusWeb.ProductsLive),
             class: "block font-extralight mb-2"
           %>
 
           <%= if user_admin?(@current_user) do %>
-            <%= link "Users",
-              to: Routes.server_user_path(@socket, :index),
+            <%= live_redirect "Users",
+              to: Routes.live_path(@socket, NexusWeb.ServerUsersLive),
               class: "block font-extralight mb-2"
             %>
           <% end %>
