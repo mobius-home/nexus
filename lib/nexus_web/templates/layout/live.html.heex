@@ -1,4 +1,4 @@
-<main class="container">
+<main>
   <p class="alert alert-info" role="alert"
     phx-click="lv:clear-flash"
     phx-value-key="info"><%= live_flash(@flash, :info) %></p>
@@ -7,5 +7,62 @@
     phx-click="lv:clear-flash"
     phx-value-key="error"><%= live_flash(@flash, :error) %></p>
 
-  <%= @inner_content %>
+  <div class="h-screen">
+    <div class="fixed h-full bg-white w-60 drop-shadow-sm">
+
+      <div class="w-full border-b pt-7 pb-7 text-center">
+        <h1 class="text-2xl font-extralight tracking-widest text-violet-500">Nexus</h1>
+      </div>
+
+      <div class="border-b py-5">
+        <div class="px-7 w-full">
+          <%= link "Products",
+            to: Routes.live_path(@socket, NexusWeb.ProductsLive),
+            class: "block font-extralight mb-2"
+          %>
+
+          <%= if user_admin?(@current_user) do %>
+            <%= link "Users",
+              to: Routes.server_user_path(@socket, :index),
+              class: "block font-extralight mb-2"
+            %>
+          <% end %>
+        </div>
+      </div> <!-- main nav -->
+
+      <div class="py-5 border-b">
+        <div class="px-7 w-full">
+          <p class="text-gray-600 tracking-wide mb-4"><%= user_full_name(@current_user) %></p>
+
+          <%= link "Log out",
+           to: Routes.user_session_path(@socket, :delete),
+           method: :delete,
+           class: "block font-extralight"
+          %>
+        </div>
+      </div> <!-- account nav -->
+
+      <div class="pt-5">
+        <div class="px-7 w-full">
+          <%= link "Docs",
+           to: "https://github.com/mobius-home/nexus/tree/main/guides",
+           class: "block font-extralight"
+          %>
+        </div>
+      </div> <!-- docs nav -->
+
+    </div> <!-- side nav -->
+
+    <!-- main content -->
+    <div class="pl-[17.5rem] pr-10 pt-5">
+      <div class="flex justify-end mb-10">
+        <div class="bg-violet-600 text-white pt-1 pb-1 pl-5 pr-5 rounded">
+          <%= link "Add Product", to: Routes.live_path(@socket, NexusWeb.ProductsLive) %>
+        </div>
+      </div>
+
+    <%= @inner_content %>
+  </div> <!-- main content -->
+</div> <!-- wrapper -->
+
 </main>

@@ -15,7 +15,7 @@ defmodule NexusWeb.RequestLoginLive do
 
   def mount(_params, _session, socket) do
     socket = socket |> assign(:changeset, RequestLogin.changeset()) |> assign(:complete, false)
-    {:ok, socket}
+    {:ok, socket, layout: {NexusWeb.LayoutView, "blank.html"}}
   end
 
   def render(assigns) do

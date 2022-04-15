@@ -12,7 +12,7 @@
       <div class="border-b py-5">
         <div class="px-7 w-full">
           <%= link "Products",
-            to: Routes.product_path(@conn, :index),
+            to: Routes.live_path(@conn, NexusWeb.ProductsLive),
             class: "block font-extralight mb-2"
           %>
 
@@ -52,7 +52,7 @@
     <div class="pl-[17.5rem] pr-10 pt-5">
       <div class="flex justify-end mb-10">
         <div class="bg-violet-600 text-white pt-1 pb-1 pl-5 pr-5 rounded">
-          <%= link "Add Product", to: Routes.product_path(@conn, :new) %>
+          <%= link "Add Product", to: Routes.live_path(@conn, NexusWeb.ProductsLive) %>
         </div>
       </div>
 

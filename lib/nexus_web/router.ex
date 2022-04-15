@@ -41,14 +41,17 @@ defmodule NexusWeb.Router do
   scope "/", NexusWeb do
     pipe_through [:browser, :require_authenticated_user]
 
-    get "/products", ProductController, :index
-    post "/products", ProductController, :create
-    get "/products/new", ProductController, :new
+    live "/products", ProductsLive
+
+    # get "/products", ProductController, :index
+    # post "/products", ProductController, :create
+    # get "/products/new", ProductController, :new
 
     scope "/products" do
       pipe_through [:product]
 
-      get "/:product_slug", ProductController, :show
+      live "/:product_slug", ProductLive
+      live "/:product_slug/add-device", ProductLive, :add_device
 
       post "/:product_slug/devices", ProductDeviceController, :create
       get "/:product_slug/devices/new", ProductDeviceController, :new

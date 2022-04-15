@@ -12,6 +12,10 @@ tailwind and Phoenix 1.6:
 @import "tailwindcss/utilities";
 
 
+.min-h-100-85 {
+  min-height: calc(100vh - 85px);
+}
+
 /* .fade-in-scale {
   animation: 0.2s ease-in 0s normal forwards 1 fade-in-scale-keys;
 }
