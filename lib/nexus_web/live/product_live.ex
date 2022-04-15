@@ -1,22 +1,21 @@
 defmodule NexusWeb.ProductLive do
   use NexusWeb, :surface_view
 
-  alias Nexus.{Accounts, Products}
+  alias Nexus.Products
   alias NexusWeb.Params
   alias NexusWeb.Params.{ProductURLParams, NewDevice}
   alias NexusWeb.Components.Modal
   alias Surface.Components.{Form, LivePatch}
   alias Surface.Components.Form.{ErrorTag, TextInput, Submit}
 
-  def mount(params, session, socket) do
+  on_mount NexusWeb.UserLiveAuth
+
+  def mount(params, _session, socket) do
     {:ok, params} = Params.bind(%ProductURLParams{}, params)
     product = Products.get_product_by_slug(params.product_slug)
 
     socket =
       socket
-      |> assign_new(:current_user, fn ->
-        Accounts.get_user_by_session_token(session["user_token"])
-      end)
       |> assign(:product, product)
       |> assign(:devices, Products.get_devices_for_product(product))
       |> assign(:device_changeset, NewDevice.changeset())

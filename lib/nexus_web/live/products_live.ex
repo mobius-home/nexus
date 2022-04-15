@@ -1,15 +1,13 @@
 defmodule NexusWeb.ProductsLive do
   use NexusWeb, :surface_view
 
-  alias Nexus.{Accounts, Products}
+  alias Nexus.Products
   alias Surface.Components.LiveRedirect
 
-  def mount(_params, session, socket) do
-    socket =
-      assign_new(socket, :current_user, fn ->
-        Accounts.get_user_by_session_token(session["user_token"])
-      end)
-      |> assign(:products, Products.all())
+  on_mount NexusWeb.UserLiveAuth
+
+  def mount(_params, _session, socket) do
+    socket = assign(socket, :products, Products.all())
 
     {:ok, socket}
   end
