@@ -97,7 +97,7 @@ Go grab a coffee, tea, water, snack or whatever you like to do during a 10
 minute break. This will give the device some time to collect metrics.
 
 If you want to continue tracking metrics over time but need to stop the example
-device, you can run `ExampleDevice.shutdown/0`. Ths will gracefully shutdown the
+device, you can run `ExampleDevice.shutdown/0`. This will gracefully shutdown the
 device and save the metrics in your your system's temp directory so they can be
 restored on future runs. This is a good way to accumulate metrics over time.
 
