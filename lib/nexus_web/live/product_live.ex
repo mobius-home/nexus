@@ -4,7 +4,7 @@ defmodule NexusWeb.ProductLive do
   alias Nexus.Products
   alias NexusWeb.Params
   alias NexusWeb.Params.{ProductURLParams, NewDevice}
-  alias NexusWeb.Components.{DeviceTable, Modal}
+  alias NexusWeb.Components.{DeviceTable, MetricsTable, Modal}
   alias Surface.Components.{Form, LivePatch}
   alias Surface.Components.Form.{ErrorTag, TextInput, Submit}
 
@@ -52,7 +52,7 @@ defmodule NexusWeb.ProductLive do
           {#match :devices}
             <DeviceTable id="device-table" product={@product} />
           {#match :metrics}
-            <p>Make a metrics table to show the types of metrics the product supports</p>
+            <MetricsTable id="metrics-table" product={@product} />
           {#match _}
             <p>This is where some product level metrics can be shown</p>
         {/case}
