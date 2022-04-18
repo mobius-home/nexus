@@ -18,7 +18,7 @@
 
           <%= if user_admin?(@current_user) do %>
             <%= link "Users",
-              to: Routes.server_user_path(@conn, :index),
+              to: Routes.live_path(@conn, NexusWeb.RequestLoginLive),
               class: "block font-extralight mb-2"
             %>
           <% end %>
