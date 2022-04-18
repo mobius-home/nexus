@@ -4,7 +4,7 @@ defmodule NexusWeb.ProductDevicesLive do
   alias Nexus.Products
   alias NexusWeb.Params
   alias NexusWeb.Components.{Modal, ProductViewContainer}
-  alias Surface.Components.Form
+  alias Surface.Components.{Form, LiveRedirect}
   alias Surface.Components.Form.{ErrorTag, TextInput, Submit}
 
   on_mount NexusWeb.UserLiveAuth
@@ -60,7 +60,11 @@ defmodule NexusWeb.ProductDevicesLive do
         <tbody id="devices" phx-update="prepend">
           {#for d <- @devices}
             <tr id={d.serial_number} class="even:bg-gray-100 font-light text-gray-500">
-              <td class="p-4">{d.serial_number}</td>
+              <td class="p-4">
+                <LiveRedirect to={Routes.live_path(@socket, NexusWeb.ProductDeviceLive, @product.slug, d.slug)}>
+                  {d.serial_number}
+                </LiveRedirect>
+              </td>
               <td class="p-4" />
             </tr>
           {/for}

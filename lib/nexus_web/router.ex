@@ -57,6 +57,9 @@ defmodule NexusWeb.Router do
       post "/:product_slug/metrics", ProductMetricController, :create
       get "/:product_slug/metrics/:metric_slug", ProductMetricController, :show
 
+      live "/:product_slug/devices/:device_slug", ProductDeviceLive
+      live "/:product_slug/devices/:device_slug/metrics", ProductDeviceMetricsLive
+
       scope "/:product_slug/devices" do
         pipe_through [:device]
 
