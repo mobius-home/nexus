@@ -16,8 +16,6 @@ defmodule NexusWeb.Components.ProductViewContainer do
   slot default, required: true
 
   def render(assigns) do
-    Enum.each(Map.from_struct(assigns.socket), fn kv -> IO.inspect(kv) end)
-
     ~F"""
     <div class="w-full bg-white rounded drop-shadow-sm min-h-[700px] p-8 filter-none">
       <div class="border-b pb-2 flex justify-between">

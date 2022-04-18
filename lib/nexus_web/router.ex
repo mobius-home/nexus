@@ -49,17 +49,16 @@ defmodule NexusWeb.Router do
       live "/:product_slug", ProductLive
 
       live "/:product_slug/devices", ProductDevicesLive
-      live "/:product_slug/devices/add-device", ProductDevicesLive, :add_device
+      live "/:product_slug/devices/new", ProductDevicesLive, :add_device
 
       live "/:product_slug/metrics", ProductMetricsLive
+      live "/:product_slug/metrics/new", ProductMetricsLive, :add_metric
 
-      get "/:product_slug/metrics/new", ProductMetricController, :new
       post "/:product_slug/metrics", ProductMetricController, :create
       get "/:product_slug/metrics/:metric_slug", ProductMetricController, :show
 
       scope "/:product_slug/devices" do
         pipe_through [:device]
-        get "/:device_slug", ProductDeviceController, :show
 
         get "/:device_slug/metrics/upload", DeviceMetricController, :new_upload
         post "/:device_slug/metrics/upload", DeviceMetricController, :upload
