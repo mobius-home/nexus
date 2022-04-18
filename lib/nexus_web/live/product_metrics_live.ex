@@ -1,23 +1,19 @@
 defmodule NexusWeb.ProductMetricsLive do
   use NexusWeb, :surface_view
 
-  on_mount NexusWeb.UserLiveAuth
-
   alias Nexus.Products
   alias NexusWeb.Params
-  alias NexusWeb.Params.ProductURLParams
   alias NexusWeb.Components.{Modal, ProductViewContainer}
   alias Surface.Components.Form
   alias Surface.Components.Form.{ErrorTag, TextInput, Submit}
 
-  def mount(params, _session, socket) do
-    {:ok, params} = Params.bind(%ProductURLParams{}, params)
-    product = Products.get_product_by_slug(params.product_slug)
+  on_mount NexusWeb.UserLiveAuth
+  on_mount {NexusWeb.GetResourceLive, :product}
 
+  def mount(_params, _session, socket) do
     socket =
       socket
-      |> assign(:product, product)
-      |> assign(:metrics, Products.get_metrics_for_product(product))
+      |> assign(:metrics, Products.get_metrics_for_product(socket.assigns.product))
       |> assign(:new_metric_errors, [])
 
     {:ok, socket, temporary_assigns: [metrics: []]}
@@ -31,7 +27,7 @@ defmodule NexusWeb.ProductMetricsLive do
     new_metric_schema = %{name: :string, type: :string}
     product = socket.assigns.product
 
-    with {:ok, normalized} <- normalize(new_metric_schema, params),
+    with {:ok, normalized} <- Params.normalize(new_metric_schema, params),
          {:ok, new_metric} <-
            Products.create_metric_for_product(product, normalized.name, normalized.type) do
       socket =
@@ -43,17 +39,9 @@ defmodule NexusWeb.ProductMetricsLive do
       {:noreply, socket}
     else
       {:error, changeset} ->
+        IO.inspect(changeset)
         {:noreply, assign(socket, :new_metric_errors, changeset.errors)}
     end
-  end
-
-  defp normalize(schema, params) do
-    fields = Map.keys(schema)
-
-    {%{}, schema}
-    |> Ecto.Changeset.cast(params, fields)
-    |> Ecto.Changeset.validate_required(fields)
-    |> Ecto.Changeset.apply_action(:insert)
   end
 
   def render(assigns) do
@@ -106,7 +94,7 @@ defmodule NexusWeb.ProductMetricsLive do
                 opts={placeholder: "Type"}
               />
 
-              <ErrorTag field={:name} class="text-red-400 font-light" />
+              <ErrorTag field={:type} class="text-red-400 font-light" />
             </div>
 
             <div class="pt-6 flex justify-end">

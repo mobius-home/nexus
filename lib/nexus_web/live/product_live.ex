@@ -1,21 +1,12 @@
 defmodule NexusWeb.ProductLive do
   use NexusWeb, :surface_view
 
-  alias Nexus.Products
-  alias NexusWeb.Params
-  alias NexusWeb.Params.ProductURLParams
   alias NexusWeb.Components.ProductViewContainer
 
   on_mount NexusWeb.UserLiveAuth
+  on_mount {NexusWeb.GetResourceLive, :product}
 
-  def mount(params, _session, socket) do
-    {:ok, params} = Params.bind(%ProductURLParams{}, params)
-    product = Products.get_product_by_slug(params.product_slug)
-
-    socket =
-      socket
-      |> assign(:product, product)
-
+  def mount(_params, _session, socket) do
     {:ok, socket}
   end
 

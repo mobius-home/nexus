@@ -1,23 +1,20 @@
 defmodule NexusWeb.ProductDevicesLive do
   use NexusWeb, :surface_view
 
-  on_mount NexusWeb.UserLiveAuth
-
   alias Nexus.Products
   alias NexusWeb.Params
-  alias NexusWeb.Params.{ProductURLParams, NewDevice}
   alias NexusWeb.Components.{Modal, ProductViewContainer}
   alias Surface.Components.Form
   alias Surface.Components.Form.{ErrorTag, TextInput, Submit}
 
-  def mount(params, _session, socket) do
-    {:ok, params} = Params.bind(%ProductURLParams{}, params)
-    product = Products.get_product_by_slug(params.product_slug)
+  on_mount NexusWeb.UserLiveAuth
+  on_mount {NexusWeb.GetResourceLive, :product}
 
+  def mount(_params, _session, socket) do
     socket =
       socket
-      |> assign(:product, product)
-      |> assign(:devices, Products.get_devices_for_product(product))
+      |> assign(:devices, Products.get_devices_for_product(socket.assigns.product))
+      |> assign(:new_device_errors, [])
 
     {:ok, socket, temporary_assigns: [devices: []]}
   end
@@ -26,10 +23,11 @@ defmodule NexusWeb.ProductDevicesLive do
     {:noreply, socket}
   end
 
-  def handle_event("add_device", params, socket) do
+  def handle_event("add_device", %{"new_device" => params}, socket) do
     product = socket.assigns.product
+    schema = %{serial_number: :string}
 
-    with {:ok, params} <- Params.bind(%NewDevice{}, params),
+    with {:ok, params} <- Params.normalize(schema, params),
          {:ok, device} <- Products.create_device_for_product(product, params.serial_number) do
       socket =
         socket
@@ -39,7 +37,7 @@ defmodule NexusWeb.ProductDevicesLive do
       {:noreply, socket}
     else
       {:error, changeset} ->
-        {:noreply, assign(socket, :device_changeset, changeset)}
+        {:noreply, assign(socket, :new_device_errors, changeset.errors)}
     end
   end
 
@@ -75,7 +73,7 @@ defmodule NexusWeb.ProductDevicesLive do
           return_to={Routes.live_path(@socket, __MODULE__, @product.slug)}
           id={:modal}
         >
-          <Form for={:new_device} submit="add_device" class="mt-12">
+          <Form for={:new_device} submit="add_device" class="mt-12" errors={@new_device_errors}>
             <TextInput
               field={:serial_number}
               class="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker"

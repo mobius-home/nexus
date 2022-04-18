@@ -2,6 +2,7 @@ defmodule NexusWeb.ServerUsersLive do
   use NexusWeb, :surface_view
 
   alias Nexus.Accounts
+  alias NexusWeb.Params
   alias NexusWeb.Components.Modal
   alias Surface.Components.{Form, LivePatch}
   alias Surface.Components.Form.{ErrorTag, Submit, TextInput}
@@ -102,7 +103,7 @@ defmodule NexusWeb.ServerUsersLive do
   def handle_event("add_user", %{"new_user" => params}, socket) do
     new_user_schema = %{first_name: :string, last_name: :string, email: :string}
 
-    with {:ok, normalized} <- normalize(new_user_schema, params),
+    with {:ok, normalized} <- Params.normalize(new_user_schema, params),
          {:ok, new_user} <-
            Accounts.add_user(normalized.email, normalized.first_name, normalized.last_name) do
       send(self(), {:user_added, new_user})
@@ -123,15 +124,6 @@ defmodule NexusWeb.ServerUsersLive do
     socket = update(socket, :users, fn users -> [new_user | users] end)
 
     {:noreply, socket}
-  end
-
-  defp normalize(schema, params) do
-    fields = Map.keys(schema)
-
-    {%{}, schema}
-    |> Ecto.Changeset.cast(params, fields)
-    |> Ecto.Changeset.validate_required(fields)
-    |> Ecto.Changeset.apply_action(:insert)
   end
 
   defp full_name(user) do

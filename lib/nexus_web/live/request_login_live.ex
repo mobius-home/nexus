@@ -9,12 +9,11 @@ defmodule NexusWeb.RequestLoginLive do
   alias Nexus.Accounts
   alias Nexus.Accounts.User
   alias NexusWeb.Params
-  alias NexusWeb.Params.RequestLogin
   alias Surface.Components.Form
   alias Surface.Components.Form.{ErrorTag, TextInput, Submit}
 
   def mount(_params, _session, socket) do
-    socket = socket |> assign(:changeset, RequestLogin.changeset()) |> assign(:complete, false)
+    socket = socket |> assign(:complete, false) |> assign(:errors, [])
     {:ok, socket, layout: {NexusWeb.LayoutView, "blank.html"}}
   end
 
@@ -28,7 +27,7 @@ defmodule NexusWeb.RequestLoginLive do
 
         {#if !@complete}
           <div class="max-w-xs mx-auto pt-12">
-            <Form for={@changeset} submit="request_login">
+            <Form for={:request_login} submit="request_login" errors={@errors}>
               <TextInput
                 field={:email}
                 class="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker"
@@ -53,8 +52,10 @@ defmodule NexusWeb.RequestLoginLive do
     """
   end
 
-  def handle_event("request_login", params, socket) do
-    with {:ok, request_login} <- Params.bind(%RequestLogin{}, params),
+  def handle_event("request_login", %{"request_login" => params}, socket) do
+    schema = %{email: :string}
+
+    with {:ok, request_login} <- Params.normalize(schema, params),
          %User{} = user <- Accounts.get_user_by_email(request_login.email),
          {:ok, _email} <-
            Accounts.send_magic_email_for_user(user, &Routes.user_session_url(socket, :create, &1)) do
@@ -64,7 +65,7 @@ defmodule NexusWeb.RequestLoginLive do
         {:noreply, assign(socket, :complete, true)}
 
       {:error, %Changeset{} = changeset} ->
-        {:noreply, assign(socket, :changeset, changeset)}
+        {:noreply, assign(socket, :errors, changeset.errors)}
     end
   end
 end

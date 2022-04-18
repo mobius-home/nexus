@@ -89,7 +89,8 @@ defmodule Nexus.Products do
     |> Changeset.validate_length(:serial_number, min: 2, max: 100)
     |> Changeset.put_change(:slug, Naming.make_slug_from_name(serial_number))
     |> Changeset.unique_constraint([:product_id, :serial_number],
-      name: :devices_my_product_data_pkey,
+      name: :data_pkey,
+      match: :suffix,
       message: "device for product already exists"
     )
     |> Repo.insert()

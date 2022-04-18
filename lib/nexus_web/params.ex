@@ -1,68 +1,41 @@
-defprotocol NexusWeb.Params do
+defmodule NexusWeb.Params do
   @moduledoc """
-  Protocol for data structures to implement that allows unknown request params
-  to be marshalled into a known structure.
+  Working with user params
 
-  This should happen at the controller level as we don't want to leak the
-  interface (the controller) concerns into the Nexus core library. The Nexus
-  core API should be able to define it's API separate from the controller.
-
-  Moreover, this will allow the known structure to check to ensure the interface
-  params are correct.
-
-  Yes this will require more code, however, this will help build a more
-  maintainable software solution.
-
-  For more information please see:
-  https://medium.com/very-big-things/towards-maintainable-elixir-the-core-and-the-interface-c267f0da43
-
-  Example implementation
-
-  ```elixir
-  defmodule UserProfileParams do
-    @type t() :: %__MODULE__{
-            first_name: binary(),
-            last_name: binary(),
-            age: integer(),
-            email: binary() | nil
-          }
-
-    defstruct [:first_name, :last_name, :age, :email]
-
-    defimpl NexusWeb.Params do
-      alias Ecto.Changeset
-
-      def bind(user_profile_params, params) do
-        types = %{first_name: :string, last_name: :string, age: :integer, email: :string}
-
-        {%{}, types}
-        |> Changeset.cast(params, Map.keys(types))
-        |> Changeset.validate_required(~w/first_name last_name age/)
-        |> Changeset.apply_action(:insert)
-        |> case do
-          {:ok, normalized_params} ->
-            {:ok,
-             %{
-               user_profile_params
-               | first_name: normalized_params.first_name,
-                 last_name: normalized_params.last_name,
-                 age: normalized_params.age,
-                 email: normalized_params.email
-             }}
-
-          error ->
-            error
-        end
-      end
-    end
-  ```
+  See [Towards Maintainable Elixir: The Core and the Interface](https://medium.com/very-big-things/towards-maintainable-elixir-the-core-and-the-interface-c267f0da43)
+  for more information.
   """
 
   alias Ecto.Changeset
 
-  @doc """
-  Try to bind the fields to the data structure
+  @typedoc """
+  A map of fields and their expected types
   """
-  @spec bind(t(), map()) :: {:ok, t()} | {:error, Changeset.t()}
-  def bind(t, map)
+  @type schema() :: map()
+
+  @typedoc """
+  Params that have been normalized against a schema
+  """
+  @type normalized_params() :: map()
+
+  @doc """
+  Normalize a loosely defined set of parameters into known data types
+  """
+  @spec normalize(schema(), map()) :: {:ok, normalized_params()} | {:error, Changeset.t()}
+  def normalize(schema, params) do
+    fields = Map.keys(schema)
+
+    {%{}, schema}
+    |> Changeset.cast(params, fields)
+    |> Changeset.validate_required(fields)
+    |> Changeset.apply_action(:insert)
+  end
+
+  @doc """
+  Schema for params that contain the product slug field
+  """
+  @spec product_slug_schema() :: schema()
+  def product_slug_schema() do
+    %{product_slug: :string}
+  end
 end
