@@ -36,6 +36,22 @@ defmodule NexusWeb do
     end
   end
 
+  def surface_live_component do
+    quote do
+      use Surface.LiveComponent
+
+      unquote(view_helpers())
+    end
+  end
+
+  def surface_component do
+    quote do
+      use Surface.Component
+
+      unquote(view_helpers())
+    end
+  end
+
   def view do
     quote do
       use Phoenix.View,
