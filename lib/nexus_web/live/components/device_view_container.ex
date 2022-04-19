@@ -10,6 +10,7 @@ defmodule NexusWeb.Components.DeviceViewContainer do
   prop socket, :struct, required: true
   prop page, :atom, required: true, values: [:overview, :devices, :metrics]
   prop product_slug, :string, required: true
+  prop product_name, :string, required: true
 
   prop modal_button_label, :string
   prop modal_button_to, :string
@@ -19,6 +20,13 @@ defmodule NexusWeb.Components.DeviceViewContainer do
   def render(assigns) do
     ~F"""
     <div class="w-full bg-white rounded drop-shadow-sm min-h-[700px] p-8 filter-none">
+      <div>
+        <LiveRedirect
+          label={@product_name}
+          to={Routes.live_path(@socket, NexusWeb.ProductLive, @product_slug)}
+          class="text-sm text-gray-500 font-light"
+        />
+      </div>
       <div class="border-b pb-2 flex justify-between">
         <h2 class="text-xl pt-[14px]">{@device.serial_number}</h2>
 
@@ -43,7 +51,7 @@ defmodule NexusWeb.Components.DeviceViewContainer do
         >Metrics</LiveRedirect>
         <LiveRedirect
           class={"mr-4", "text-sm", "font-bold": @page == :settings}
-          to={Routes.live_path(@socket, NexusWeb.ProductMetricsLive, @product_slug)}
+          to={Routes.live_path(@socket, NexusWeb.ProductDeviceLive, @product_slug, @device.slug)}
         >Settings</LiveRedirect>
       </div>
 

@@ -14,9 +14,10 @@ defmodule NexusWeb.ProductDeviceLive do
     ~F"""
     <DeviceViewContainer
       device={@device}
-      product_slug={@product.slug}
       page={:overview}
       socket={@socket}
+      product_slug={@product.slug}
+      product_name={@product.name}
     >
       <p>Some information about the device</p>
     </DeviceViewContainer>

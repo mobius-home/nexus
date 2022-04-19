@@ -34,10 +34,10 @@ defmodule Nexus.Products.MetricImports do
   end
 
   defp read_file(filename) do
-    if Path.extname(filename) == ".mbf" do
+    if File.exists?(filename) do
       File.read(filename)
     else
-      {:ok, :format_not_supported}
+      {:error, :file_missing}
     end
   end
 
@@ -122,9 +122,6 @@ defmodule Nexus.Products.MetricImports do
   end
 
   defp transform_metric_tags(metrics, tag_table) do
-    IO.inspect(tag_table)
-    IO.inspect(metrics)
-
     Enum.map(metrics, fn metric ->
       tag_array =
         Enum.reduce(metric.tags, [], fn {key, value}, array ->

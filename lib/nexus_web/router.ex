@@ -60,10 +60,14 @@ defmodule NexusWeb.Router do
       live "/:product_slug/devices/:device_slug", ProductDeviceLive
       live "/:product_slug/devices/:device_slug/metrics", ProductDeviceMetricsLive
 
+      live "/:product_slug/devices/:device_slug/metrics/upload",
+           ProductDeviceMetricsLive,
+           :metric_upload
+
       scope "/:product_slug/devices" do
         pipe_through [:device]
 
-        get "/:device_slug/metrics/upload", DeviceMetricController, :new_upload
+        # get "/:device_slug/metrics/upload", DeviceMetricController, :new_upload
         post "/:device_slug/metrics/upload", DeviceMetricController, :upload
         get "/:device_slug/metrics/:metric_slug", DeviceMetricController, :show
       end
