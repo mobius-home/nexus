@@ -11,7 +11,7 @@ defmodule NexusWeb.Params do
   @typedoc """
   A map of fields and their expected types
   """
-  @type schema() :: map()
+  @type schema() :: map() | keyword()
 
   @typedoc """
   Params that have been normalized against a schema
@@ -22,6 +22,26 @@ defmodule NexusWeb.Params do
   Normalize a loosely defined set of parameters into known data types
   """
   @spec normalize(schema(), map()) :: {:ok, normalized_params()} | {:error, Changeset.t()}
+  def normalize(schema, params) when is_list(schema) do
+    normalized_schema =
+      Enum.reduce(schema, %{types: %{}, required: []}, fn {field_name, field_info},
+                                                          parsed_schema ->
+        new_types = Map.put(parsed_schema.types, field_name, field_info.type)
+
+        if required?(field_info) do
+          new_required = [field_name | parsed_schema.required]
+          %{parsed_schema | types: new_types, required: new_required}
+        else
+          %{parsed_schema | types: new_types}
+        end
+      end)
+
+    {%{}, normalized_schema.types}
+    |> Changeset.cast(params, Map.keys(normalized_schema.types))
+    |> Changeset.validate_required(normalized_schema.required)
+    |> Changeset.apply_action(:insert)
+  end
+
   def normalize(schema, params) do
     fields = Map.keys(schema)
 
@@ -29,6 +49,10 @@ defmodule NexusWeb.Params do
     |> Changeset.cast(params, fields)
     |> Changeset.validate_required(fields)
     |> Changeset.apply_action(:insert)
+  end
+
+  defp required?(field_info) do
+    Map.get(field_info, :required) || false
   end
 
   @doc """

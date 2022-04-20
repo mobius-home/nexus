@@ -59,7 +59,6 @@ defmodule Nexus.MixProject do
       {:ecto_timescaledb, "~> 0.10.0"},
       {:vega_lite, "~> 0.1.3"},
       {:surface, "~> 0.7.1"},
-      {:surface_formatter, "~> 0.7.5"},
       {:mobius, "~> 0.4.0"}
     ]
   end
