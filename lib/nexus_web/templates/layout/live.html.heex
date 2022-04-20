@@ -54,15 +54,10 @@
     </div> <!-- side nav -->
 
     <!-- main content -->
-    <div class="pl-[17.5rem] pr-10 pt-5">
-      <div class="flex justify-end mb-10">
-        <div class="bg-violet-600 text-white pt-1 pb-1 pl-5 pr-5 rounded">
-          <%= link "Add Product", to: Routes.live_path(@socket, NexusWeb.ProductsLive) %>
-        </div>
+    <div class="pl-[17.5rem] pr-10 pt-5 pb-10">
+      <div class="mt-10">
+        <%= @inner_content %>
       </div>
-
-    <%= @inner_content %>
-  </div> <!-- main content -->
-</div> <!-- wrapper -->
-
+    </div> <!-- main content -->
+  </div> <!-- wrapper -->
 </main>

@@ -80,16 +80,18 @@ defmodule NexusWeb.ProductDeviceMetricsLive do
       {:ok, :done}
     end)
 
-    {:noreply,
-     push_patch(socket,
-       to:
-         Routes.live_path(
-           socket,
-           __MODULE__,
-           socket.assigns.product.slug,
-           socket.assigns.product.device.slug
-         )
-     )}
+    socket =
+      push_patch(socket,
+        to:
+          Routes.live_path(
+            socket,
+            __MODULE__,
+            socket.assigns.product.slug,
+            socket.assigns.device.slug
+          )
+      )
+
+    {:noreply, socket}
   end
 
   def handle_event("selected_metric", %{"metric_select" => params}, socket) do
@@ -163,8 +165,19 @@ defmodule NexusWeb.ProductDeviceMetricsLive do
         </Form>
       </div>
 
-      <canvas id="chart" phx-hook="MetricChart" data-measurements={prepare_measurements(@measurements)}>
-      </canvas>
+      {#if @selected_metric == nil}
+        <p class="text-center text-gray-500 pt-20">Please select a metric</p>
+      {#elseif Enum.empty?(@measurements)}
+        <p class="text-center text-gray-500 pt-20">No metrics reported in time frame</p>
+      {#else}
+        <canvas
+          id="chart"
+          phx-hook="MetricChart"
+          data-measurements={prepare_measurements(@measurements)}
+          class="max-h-[500px]"
+        >
+        </canvas>
+      {/if}
 
       {#if @live_action == :metric_upload}
         <Modal
@@ -200,8 +213,8 @@ defmodule NexusWeb.ProductDeviceMetricsLive do
   defp prepare_measurements(measurements) do
     Enum.reduce(measurements, %{labels: [], data: []}, fn measurement, chart_config ->
       if measurement.value != nil do
-        new_labels = chart_config.labels ++ [DateTime.to_iso8601(measurement.time)]
-        new_data = chart_config.data ++ [measurement.value]
+        new_labels = [time_to_string(measurement.time) | chart_config.labels]
+        new_data = [measurement.value | chart_config.data]
 
         %{chart_config | labels: new_labels, data: new_data}
       else
@@ -209,5 +222,9 @@ defmodule NexusWeb.ProductDeviceMetricsLive do
       end
     end)
     |> Jason.encode!()
+  end
+
+  defp time_to_string(date_time) do
+    "#{date_time.hour}:#{date_time.minute}"
   end
 end
