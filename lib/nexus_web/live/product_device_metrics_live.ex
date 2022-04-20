@@ -18,8 +18,7 @@ defmodule NexusWeb.ProductDeviceMetricsLive do
   def mount(_params, _session, socket) do
     socket =
       socket
-      |> assign(:selected_metric, nil)
-      |> assign(:selected_metric_type, nil)
+      |> assign(:query_params, %{})
       |> assign(:measurements, [])
       |> allow_upload(:metrics, accept: ~w(.mbf .json), max_entries: 1)
 
@@ -29,18 +28,30 @@ defmodule NexusWeb.ProductDeviceMetricsLive do
   def handle_params(params, _url, socket) do
     schema = [
       metric_name: %{type: :string},
-      metric_type: %{type: :string}
+      metric_type: %{type: :string},
+      time_window: %{type: :string}
     ]
 
     case Params.normalize(schema, params) do
       {:ok, normalized_params} ->
-        socket = maybe_fetch_measurements(normalized_params, socket)
+        socket =
+          socket
+          |> update_query_params(normalized_params)
+          |> maybe_fetch_measurements()
 
         {:noreply, socket}
     end
   end
 
-  defp maybe_fetch_measurements(%{metric_name: metric_name, metric_type: metric_type}, socket) do
+  defp maybe_fetch_measurements(%{assigns: %{query_params: params}} = socket)
+       when map_size(params) == 0 do
+    socket
+  end
+
+  defp maybe_fetch_measurements(
+         %{assigns: %{query_params: %{metric_name: metric_name, metric_type: metric_type}}} =
+           socket
+       ) do
     metric =
       Enum.find(socket.assigns.metrics, fn metric ->
         metric.name == metric_name && metric.type == metric_type
@@ -65,7 +76,7 @@ defmodule NexusWeb.ProductDeviceMetricsLive do
     end
   end
 
-  defp maybe_fetch_measurements(_params, socket) do
+  defp maybe_fetch_measurements(socket) do
     socket
   end
 
@@ -100,6 +111,7 @@ defmodule NexusWeb.ProductDeviceMetricsLive do
     case Params.normalize(schema, params) do
       {:ok, normalized} ->
         [name, type] = String.split(normalized.metric_name, "-")
+        socket = update_query_params(socket, %{metric_name: name, metric_type: type})
 
         {:noreply,
          push_patch(socket,
@@ -109,8 +121,31 @@ defmodule NexusWeb.ProductDeviceMetricsLive do
                __MODULE__,
                socket.assigns.product.slug,
                socket.assigns.device.slug,
-               metric_name: name,
-               metric_type: type
+               socket.assigns.query_params
+             )
+         )}
+    end
+  end
+
+  def handle_event("update_time_window", %{"time_window" => params}, socket) do
+    schema = [
+      time_window: %{type: :string, required: true}
+    ]
+
+    case Params.normalize(schema, params) do
+      {:ok, normalized} ->
+        socket = update_query_params(socket, normalized)
+        IO.inspect(socket.assigns.query_params)
+
+        {:noreply,
+         push_patch(socket,
+           to:
+             Routes.live_path(
+               socket,
+               __MODULE__,
+               socket.assigns.product.slug,
+               socket.assigns.device.slug,
+               socket.assigns.query_params
              )
          )}
     end
@@ -134,7 +169,7 @@ defmodule NexusWeb.ProductDeviceMetricsLive do
               field="metric_name"
               options={metrics_as_options(@metrics)}
               prompt="Please select a metric"
-              selected={get_selected(@selected_metric, @selected_metric_type)}
+              selected={get_selected(@query_params)}
               class="border border-gray-300 rounded px-4 py-2 text-base font-normal appearance-none"
             />
             <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
@@ -152,6 +187,7 @@ defmodule NexusWeb.ProductDeviceMetricsLive do
             <Select
               field="time_window"
               options={["Last hour", "Last 24 hours", "Last 7 days", "Last 30 days"]}
+              selected="Last hour"
               class="border border-gray-300 rounded px-4 py-2 text-base font-normal appearance-none"
             />
             <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
@@ -165,7 +201,7 @@ defmodule NexusWeb.ProductDeviceMetricsLive do
         </Form>
       </div>
 
-      {#if @selected_metric == nil}
+      {#if Map.get(@query_params, :metric_name) == nil}
         <p class="text-center text-gray-500 pt-20">Please select a metric</p>
       {#elseif Enum.empty?(@measurements)}
         <p class="text-center text-gray-500 pt-20">No metrics reported in time frame</p>
@@ -207,8 +243,8 @@ defmodule NexusWeb.ProductDeviceMetricsLive do
     end)
   end
 
-  defp get_selected(nil, _), do: ""
-  defp get_selected(metric, type), do: "#{metric}-#{type}"
+  defp get_selected(%{metric_name: metric, metric_type: type}), do: "#{metric}-#{type}"
+  defp get_selected(_), do: ""
 
   defp prepare_measurements(measurements) do
     Enum.reduce(measurements, %{labels: [], data: []}, fn measurement, chart_config ->
@@ -226,5 +262,10 @@ defmodule NexusWeb.ProductDeviceMetricsLive do
 
   defp time_to_string(date_time) do
     "#{date_time.hour}:#{date_time.minute}"
+  end
+
+  defp update_query_params(socket, params) do
+    new_params = Map.merge(socket.assigns.query_params, params)
+    assign(socket, :query_params, new_params)
   end
 end

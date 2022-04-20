@@ -204,16 +204,16 @@ defmodule Nexus.Products do
 
     query = """
     SELECT
-      time_bucket_gapfill ('60 second',
+      time_bucket_gapfill ('3600 second',
         time,
-        now() - INTERVAL '1 hour',
+        now() - INTERVAL '24 hour',
         now()) AS bucket,
       locf (ROUND(AVG(value))) AS value,
       jsonb(tags)
     FROM
       #{table_name}
     WHERE
-      time > now() - INTERVAL '1 hour'
+      time > now() - INTERVAL '24 hour'
       AND metric_id = $1
       AND device_id = $2
     GROUP BY
