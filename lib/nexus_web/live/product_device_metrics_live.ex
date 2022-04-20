@@ -29,7 +29,7 @@ defmodule NexusWeb.ProductDeviceMetricsLive do
   def handle_params(params, _url, socket) do
     schema = [
       metric_name: %{type: :string},
-      metric_type: %{type: :string},
+      metric_type: %{type: :string}
     ]
 
     case Params.normalize(schema, params) do
@@ -49,12 +49,14 @@ defmodule NexusWeb.ProductDeviceMetricsLive do
     case metric do
       nil ->
         socket
+
       metric ->
-        measurements = Products.query_measurements_for_device(
-          socket.assigns.product,
-          metric,
-          socket.assigns.device
-        )
+        measurements =
+          Products.query_measurements_for_device(
+            socket.assigns.product,
+            metric,
+            socket.assigns.device
+          )
 
         socket
         |> assign(:selected_metric, metric_name)
@@ -161,24 +163,8 @@ defmodule NexusWeb.ProductDeviceMetricsLive do
         </Form>
       </div>
 
-      <table class="table-auto w-full">
-        <thead>
-          <tr>
-            <th class="text-left border-b-2 font-medium text-sm p-4 pb-2 text-gray-600">Timestamp</th>
-            <th class="text-left border-b-2 font-medium text-sm p-4 pb-2 text-gray-600">Value</th>
-            <th class="text-left border-b-2 font-medium text-sm p-4 pb-2 text-gray-600">Tags</th>
-          </tr>
-        </thead>
-        <tbody>
-          {#for m <- @measurements}
-            <tr class="even:bg-gray-100 font-light text-gray-500">
-              <td class="p-4">{DateTime.to_string(m.time)}</td>
-              <td class="p-4">{m.value}</td>
-              <td class="p-4">{tags_as_string(m.tags)}</td>
-            </tr>
-          {/for}
-        </tbody>
-      </table>
+      <canvas id="chart" phx-hook="MetricChart" data-measurements={prepare_measurements(@measurements)}>
+      </canvas>
 
       {#if @live_action == :metric_upload}
         <Modal
@@ -208,10 +194,20 @@ defmodule NexusWeb.ProductDeviceMetricsLive do
     end)
   end
 
-  defp tags_as_string(tags) do
-    Jason.encode!(tags)
-  end
-
   defp get_selected(nil, _), do: ""
   defp get_selected(metric, type), do: "#{metric}-#{type}"
+
+  defp prepare_measurements(measurements) do
+    Enum.reduce(measurements, %{labels: [], data: []}, fn measurement, chart_config ->
+      if measurement.value != nil do
+        new_labels = chart_config.labels ++ [DateTime.to_iso8601(measurement.time)]
+        new_data = chart_config.data ++ [measurement.value]
+
+        %{chart_config | labels: new_labels, data: new_data}
+      else
+        chart_config
+      end
+    end)
+    |> Jason.encode!()
+  end
 end
