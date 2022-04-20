@@ -112,11 +112,6 @@ defmodule NexusWeb.ProductDeviceMetricsLive do
     end
   end
 
-  defp query_measurements_for_metric(select_name, socket) do
-    [name, type] = String.split(select_name, "-")
-
-  end
-
   def render(assigns) do
     ~F"""
     <DeviceViewContainer
