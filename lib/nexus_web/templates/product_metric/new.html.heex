@@ -1,9 +1,0 @@
-<h1>Add Metric</h1>
-
-<%= form_for @changeset, Routes.product_metric_path(@conn, :create, @product_slug), fn f -> %>
-  <%= text_input f, :name, placeholder: "my.metric.name" %>
-
-  <%= text_input f, :type, placeholder: "last_value" %>
-
-  <%= submit "Add" %>
-<% end %>

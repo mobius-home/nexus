@@ -26,17 +26,6 @@ defmodule NexusWeb.RequestLoginLiveTest do
     assert rendered =~ "can&#39;t be blank"
   end
 
-  test "submitting bad email format", %{conn: conn} do
-    {:ok, view, _html} = live(conn, "/")
-
-    rendered =
-      view
-      |> element("form")
-      |> render_submit(%{request_login: %{email: "thisshouldnotwork"}})
-
-    assert rendered =~ "must have the @ sign and no spaces"
-  end
-
   test "submitting unknown user email", %{conn: conn} do
     {:ok, view, _html} = live(conn, "/")
 

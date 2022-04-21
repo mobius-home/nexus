@@ -7,8 +7,7 @@ defmodule NexusWeb.UserSessionController do
 
   alias Nexus.Accounts
   alias Nexus.Accounts.User
-  alias NexusWeb.{RequestParams, UserAuth}
-  alias NexusWeb.RequestParams.TokenParams
+  alias NexusWeb.{Params, UserAuth}
 
   def new(conn, _params) do
     changeset = Accounts.user_changeset()
@@ -19,7 +18,11 @@ defmodule NexusWeb.UserSessionController do
   end
 
   def create(conn, params) do
-    with {:ok, params} <- RequestParams.bind(%TokenParams{}, params),
+    schema = [
+      token: %{type: :string, required: true}
+    ]
+
+    with {:ok, params} <- Params.normalize(schema, params),
          %User{} = user <- Accounts.use_login_token_for_user(params.token) do
       UserAuth.log_in_user(conn, user)
     else

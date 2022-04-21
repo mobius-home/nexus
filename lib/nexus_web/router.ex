@@ -12,14 +12,6 @@ defmodule NexusWeb.Router do
     plug :fetch_current_user
   end
 
-  pipeline :product do
-    plug NexusWeb.Plugs.GetProduct
-  end
-
-  pipeline :device do
-    plug NexusWeb.Plugs.GetDevice
-  end
-
   pipeline :api do
     plug :accepts, ["json"]
   end
@@ -45,8 +37,6 @@ defmodule NexusWeb.Router do
     live "/products/new", ProductsLive, :add_product
 
     scope "/products" do
-      pipe_through [:product]
-
       live "/:product_slug", ProductLive
 
       live "/:product_slug/devices", ProductDevicesLive
@@ -54,9 +44,6 @@ defmodule NexusWeb.Router do
 
       live "/:product_slug/metrics", ProductMetricsLive
       live "/:product_slug/metrics/new", ProductMetricsLive, :add_metric
-
-      post "/:product_slug/metrics", ProductMetricController, :create
-      get "/:product_slug/metrics/:metric_slug", ProductMetricController, :show
 
       live "/:product_slug/devices/:device_slug", ProductDeviceLive
       live "/:product_slug/devices/:device_slug/metrics", ProductDeviceMetricsLive

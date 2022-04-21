@@ -53,7 +53,9 @@ defmodule NexusWeb.RequestLoginLive do
   end
 
   def handle_event("request_login", %{"request_login" => params}, socket) do
-    schema = %{email: :string}
+    schema = [
+      email: %{type: :string, required: true}
+    ]
 
     with {:ok, request_login} <- Params.normalize(schema, params),
          %User{} = user <- Accounts.get_user_by_email(request_login.email),
