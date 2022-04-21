@@ -3,10 +3,8 @@ defmodule NexusWeb.ProductMetricsLive do
 
   alias Nexus.Products
   alias NexusWeb.Params
-  alias NexusWeb.Components.{Modal, ProductViewContainer}
+  alias NexusWeb.Components.{ModalForm, ProductViewContainer}
   alias NexusWeb.Components.Form.TextInput
-  alias Surface.Components.Form
-  alias Surface.Components.Form.Submit
 
   on_mount NexusWeb.UserLiveAuth
   on_mount {NexusWeb.GetResourceLive, :product}
@@ -71,28 +69,22 @@ defmodule NexusWeb.ProductMetricsLive do
       </table>
 
       {#if @live_action == :add_metric}
-        <Modal
-          title="New Device"
-          return_to={Routes.live_path(@socket, __MODULE__, @product.slug)}
+        <ModalForm
           id={:modal}
+          title="New Metric"
+          return_to={Routes.live_path(@socket, __MODULE__, @product.slug)}
+          for={:new_metric}
+          submit="add_metric"
+          errors={@new_metric_errors}
         >
-          <Form for={:new_metric} submit="add_metric" class="mt-12" errors={@new_metric_errors}>
-            <div class="mb-6">
-              <TextInput field_name={:name} placeholder="Name" />
-            </div>
+          <div class="mb-6">
+            <TextInput field_name={:name} placeholder="Name" />
+          </div>
 
-            <div class="mb-6">
-              <TextInput field_name={:type} placeholder="Type" />
-            </div>
-
-            <div class="pt-6 flex justify-end">
-              <Submit
-                label="Add"
-                class="bg-violet-600 text-white pt-1 pb-1 pl-5 pr-5 rounded font-light hover:bg-violet-700"
-              />
-            </div>
-          </Form>
-        </Modal>
+          <div class="mb-6">
+            <TextInput field_name={:type} placeholder="Type" />
+          </div>
+        </ModalForm>
       {/if}
     </ProductViewContainer>
     """

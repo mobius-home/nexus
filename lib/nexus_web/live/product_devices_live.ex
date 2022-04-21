@@ -3,10 +3,9 @@ defmodule NexusWeb.ProductDevicesLive do
 
   alias Nexus.Products
   alias NexusWeb.Params
-  alias NexusWeb.Components.{Modal, ProductViewContainer}
+  alias NexusWeb.Components.{ModalForm, ProductViewContainer}
   alias NexusWeb.Components.Form.TextInput
-  alias Surface.Components.{Form, LiveRedirect}
-  alias Surface.Components.Form.Submit
+  alias Surface.Components.LiveRedirect
 
   on_mount NexusWeb.UserLiveAuth
   on_mount {NexusWeb.GetResourceLive, :product}
@@ -73,22 +72,16 @@ defmodule NexusWeb.ProductDevicesLive do
       </table>
 
       {#if @live_action == :add_device}
-        <Modal
+        <ModalForm
+          id={:modal}
           title="New Device"
           return_to={Routes.live_path(@socket, __MODULE__, @product.slug)}
-          id={:modal}
+          for={:new_device}
+          submit="add_device"
+          errors={@new_device_errors}
         >
-          <Form for={:new_device} submit="add_device" class="mt-12" errors={@new_device_errors}>
-            <TextInput field_name={:serial_number} placeholder="Serial number" />
-
-            <div class="pt-6 flex justify-end">
-              <Submit
-                label="Add"
-                class="bg-violet-600 text-white pt-1 pb-1 pl-5 pr-5 rounded font-light hover:bg-violet-700"
-              />
-            </div>
-          </Form>
-        </Modal>
+          <TextInput field_name={:serial_number} placeholder="Serial number" />
+        </ModalForm>
       {/if}
     </ProductViewContainer>
     """

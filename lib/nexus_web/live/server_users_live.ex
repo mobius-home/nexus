@@ -3,10 +3,9 @@ defmodule NexusWeb.ServerUsersLive do
 
   alias Nexus.Accounts
   alias NexusWeb.Params
-  alias NexusWeb.Components.Modal
+  alias NexusWeb.Components.ModalForm
   alias NexusWeb.Components.Form.TextInput
-  alias Surface.Components.{Form, LivePatch}
-  alias Surface.Components.Form.Submit
+  alias Surface.Components.LivePatch
 
   on_mount NexusWeb.UserLiveAuth
 
@@ -56,28 +55,26 @@ defmodule NexusWeb.ServerUsersLive do
       </table>
 
       {#if @live_action == :add_user}
-        <Modal title="New Device" return_to={Routes.live_path(@socket, __MODULE__)} id={:modal}>
-          <Form for={:new_user} submit="add_user" class="mt-12" errors={@new_user_errors}>
-            <div class="mb-6">
-              <TextInput field_name={:first_name} placeholder="First name" />
-            </div>
+        <ModalForm
+          id={:modal}
+          title="New User"
+          return_to={Routes.live_path(@socket, __MODULE__)}
+          for={:new_user}
+          submit="add_user"
+          errors={@new_user_errors}
+        >
+          <div class="mb-6">
+            <TextInput field_name={:first_name} placeholder="First name" />
+          </div>
 
-            <div class="mb-6">
-              <TextInput field_name={:last_name} placeholder="Last name" />
-            </div>
+          <div class="mb-6">
+            <TextInput field_name={:last_name} placeholder="Last name" />
+          </div>
 
-            <div class="mb-6">
-              <TextInput field_name={:email} placeholder="Email" />
-            </div>
-
-            <div class="pt-6 flex justify-end">
-              <Submit
-                label="Add"
-                class="bg-violet-600 text-white pt-1 pb-1 pl-5 pr-5 rounded font-light hover:bg-violet-700"
-              />
-            </div>
-          </Form>
-        </Modal>
+          <div class="mb-6">
+            <TextInput field_name={:email} placeholder="Email" />
+          </div>
+        </ModalForm>
       {/if}
     </div>
     """

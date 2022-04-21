@@ -3,10 +3,9 @@ defmodule NexusWeb.ProductsLive do
 
   alias Nexus.Products
   alias NexusWeb.Params
-  alias NexusWeb.Components.Modal
+  alias NexusWeb.Components.ModalForm
   alias NexusWeb.Components.Form.TextInput
-  alias Surface.Components.{Form, LivePatch, LiveRedirect}
-  alias Surface.Components.Form.Submit
+  alias Surface.Components.{LivePatch, LiveRedirect}
 
   on_mount NexusWeb.UserLiveAuth
 
@@ -90,18 +89,16 @@ defmodule NexusWeb.ProductsLive do
         </div>
       </div>
       {#if @live_action == :add_product}
-        <Modal id="modal" title="New product" return_to={Routes.live_path(@socket, __MODULE__)}>
-          <Form for={:new_product} submit="add_product" errors={@new_product_errors} class="mt-10">
-            <TextInput field_name={:name} placeholder="Name" />
-
-            <div class="pt-6 flex justify-end">
-              <Submit
-                label="Add"
-                class="bg-violet-600 text-white pt-1 pb-1 pl-5 pr-5 rounded font-light hover:bg-violet-700"
-              />
-            </div>
-          </Form>
-        </Modal>
+        <ModalForm
+          id="modal"
+          title="New product"
+          return_to={Routes.live_path(@socket, __MODULE__)}
+          for={:new_product}
+          submit="add_product"
+          errors={@new_product_errors}
+        >
+          <TextInput field_name={:name} placeholder="Name" />
+        </ModalForm>
       {/if}
     </div>
     """
