@@ -4,8 +4,9 @@ defmodule NexusWeb.ServerUsersLive do
   alias Nexus.Accounts
   alias NexusWeb.Params
   alias NexusWeb.Components.Modal
+  alias NexusWeb.Components.Form.TextInput
   alias Surface.Components.{Form, LivePatch}
-  alias Surface.Components.Form.{ErrorTag, Submit, TextInput}
+  alias Surface.Components.Form.Submit
 
   on_mount NexusWeb.UserLiveAuth
 
@@ -58,33 +59,15 @@ defmodule NexusWeb.ServerUsersLive do
         <Modal title="New Device" return_to={Routes.live_path(@socket, __MODULE__)} id={:modal}>
           <Form for={:new_user} submit="add_user" class="mt-12" errors={@new_user_errors}>
             <div class="mb-6">
-              <TextInput
-                field={:first_name}
-                class="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker"
-                opts={placeholder: "First name"}
-              />
-
-              <ErrorTag field={:first_name} class="text-red-400 font-light" />
+              <TextInput field_name={:first_name} placeholder="First name" />
             </div>
 
             <div class="mb-6">
-              <TextInput
-                field={:last_name}
-                class="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker"
-                opts={placeholder: "last_name"}
-              />
-
-              <ErrorTag field={:last_name} class="text-red-400 font-light" />
+              <TextInput field_name={:last_name} placeholder="Last name" />
             </div>
 
             <div class="mb-6">
-              <TextInput
-                field={:email}
-                class="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker"
-                opts={placeholder: "Email"}
-              />
-
-              <ErrorTag field={:email} class="text-red-400 font-light" />
+              <TextInput field_name={:email} placeholder="Email" />
             </div>
 
             <div class="pt-6 flex justify-end">

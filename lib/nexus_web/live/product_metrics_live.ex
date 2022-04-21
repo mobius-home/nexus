@@ -4,8 +4,9 @@ defmodule NexusWeb.ProductMetricsLive do
   alias Nexus.Products
   alias NexusWeb.Params
   alias NexusWeb.Components.{Modal, ProductViewContainer}
+  alias NexusWeb.Components.Form.TextInput
   alias Surface.Components.Form
-  alias Surface.Components.Form.{ErrorTag, TextInput, Submit}
+  alias Surface.Components.Form.Submit
 
   on_mount NexusWeb.UserLiveAuth
   on_mount {NexusWeb.GetResourceLive, :product}
@@ -39,7 +40,6 @@ defmodule NexusWeb.ProductMetricsLive do
       {:noreply, socket}
     else
       {:error, changeset} ->
-        IO.inspect(changeset)
         {:noreply, assign(socket, :new_metric_errors, changeset.errors)}
     end
   end
@@ -78,23 +78,11 @@ defmodule NexusWeb.ProductMetricsLive do
         >
           <Form for={:new_metric} submit="add_metric" class="mt-12" errors={@new_metric_errors}>
             <div class="mb-6">
-              <TextInput
-                field={:name}
-                class="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker"
-                opts={placeholder: "Name"}
-              />
-
-              <ErrorTag field={:name} class="text-red-400 font-light" />
+              <TextInput field_name={:name} placeholder="Name" />
             </div>
 
             <div class="mb-6">
-              <TextInput
-                field={:type}
-                class="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker"
-                opts={placeholder: "Type"}
-              />
-
-              <ErrorTag field={:type} class="text-red-400 font-light" />
+              <TextInput field_name={:type} placeholder="Type" />
             </div>
 
             <div class="pt-6 flex justify-end">

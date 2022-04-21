@@ -4,8 +4,9 @@ defmodule NexusWeb.ProductDevicesLive do
   alias Nexus.Products
   alias NexusWeb.Params
   alias NexusWeb.Components.{Modal, ProductViewContainer}
+  alias NexusWeb.Components.Form.TextInput
   alias Surface.Components.{Form, LiveRedirect}
-  alias Surface.Components.Form.{ErrorTag, TextInput, Submit}
+  alias Surface.Components.Form.Submit
 
   on_mount NexusWeb.UserLiveAuth
   on_mount {NexusWeb.GetResourceLive, :product}
@@ -78,13 +79,7 @@ defmodule NexusWeb.ProductDevicesLive do
           id={:modal}
         >
           <Form for={:new_device} submit="add_device" class="mt-12" errors={@new_device_errors}>
-            <TextInput
-              field={:serial_number}
-              class="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker"
-              opts={placeholder: "Serial number"}
-            />
-
-            <ErrorTag field={:serial_number} class="text-red-400 font-light" />
+            <TextInput field_name={:serial_number} placeholder="Serial number" />
 
             <div class="pt-6 flex justify-end">
               <Submit

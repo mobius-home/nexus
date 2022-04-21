@@ -9,8 +9,9 @@ defmodule NexusWeb.RequestLoginLive do
   alias Nexus.Accounts
   alias Nexus.Accounts.User
   alias NexusWeb.Params
+  alias NexusWeb.Components.Form.TextInput
   alias Surface.Components.Form
-  alias Surface.Components.Form.{ErrorTag, TextInput, Submit}
+  alias Surface.Components.Form.Submit
 
   def mount(_params, _session, socket) do
     socket = socket |> assign(:complete, false) |> assign(:errors, [])
@@ -28,13 +29,7 @@ defmodule NexusWeb.RequestLoginLive do
         {#if !@complete}
           <div class="max-w-xs mx-auto pt-12">
             <Form for={:request_login} submit="request_login" errors={@errors}>
-              <TextInput
-                field={:email}
-                class="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker"
-                opts={placeholder: "Email address"}
-              />
-
-              <ErrorTag field={:email} class="text-red-400 font-light" />
+              <TextInput field_name={:email} placeholder="Email" />
 
               <div class="pt-6 flex justify-end">
                 <Submit
