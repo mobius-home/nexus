@@ -16,15 +16,12 @@ class MetricChart {
           }
         ],
       },
-      // options: {
-      //   scales: {
-      //     y: {
-      //       suggestedMin: 50,
-      //       suggestedMax: 200,
-      //     },
-      //   },
-      // }
     })
+  }
+
+  update(labels, data) {
+    this.chart.data.labels = labels;
+    this.chart.data.datasets[0].data = data;
   }
 }
 

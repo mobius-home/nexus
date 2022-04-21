@@ -193,27 +193,34 @@ defmodule Nexus.Products do
     Repo.one(query)
   end
 
+  @type measurement_resolution() :: :hour | :day | :week | :month
+
+  @type measurement_query_opt() :: {:resolution, measurement_resolution()}
+
   @doc """
   Query for a time series list of measurements for a metric for a device
   """
-  @spec query_measurements_for_device(Product.t(), Metric.t(), Device.t()) :: [
+  @spec query_measurements_for_device(Product.t(), Metric.t(), Device.t(), [
+          measurement_query_opt()
+        ]) :: [
           Measurement.t()
         ]
-  def query_measurements_for_device(product, metric, device) do
+  def query_measurements_for_device(product, metric, device, opts \\ []) do
     table_name = "#{product.data_schema}.#{metric.table_name}"
+    {seconds, interval_window} = get_resolution_values(opts)
 
     query = """
     SELECT
-      time_bucket_gapfill ('3600 second',
+      time_bucket_gapfill ('#{seconds}',
         time,
-        now() - INTERVAL '24 hour',
+        now() - INTERVAL '#{interval_window}',
         now()) AS bucket,
       locf (ROUND(AVG(value))) AS value,
       jsonb(tags)
     FROM
       #{table_name}
     WHERE
-      time > now() - INTERVAL '24 hour'
+      time > now() - INTERVAL '#{interval_window}'
       AND metric_id = $1
       AND device_id = $2
     GROUP BY
@@ -234,6 +241,22 @@ defmodule Nexus.Products do
         tags: tags || %{}
       }
     end)
+  end
+
+  defp get_resolution_values(opts) do
+    case opts[:resolution] do
+      res when res in [nil, :hour] ->
+        {"60 second", "1 hour"}
+
+      :day ->
+        {"3600 second", "24 hour"}
+
+      :week ->
+        {"3600 second", "7 day"}
+
+      :month ->
+        {"3600 second", "30 day"}
+    end
   end
 
   @doc """
