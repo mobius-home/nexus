@@ -8,7 +8,7 @@ defmodule NexusWeb.Components.DeviceViewContainer do
 
   prop device, :struct, required: true
   prop socket, :struct, required: true
-  prop page, :atom, required: true, values: [:overview, :devices, :metrics]
+  prop page, :atom, required: true, values: [:overview, :settings, :metrics]
   prop product_slug, :string, required: true
   prop product_name, :string, required: true
 
@@ -51,7 +51,7 @@ defmodule NexusWeb.Components.DeviceViewContainer do
         >Metrics</LiveRedirect>
         <LiveRedirect
           class={"mr-4", "text-sm", "font-bold": @page == :settings}
-          to={Routes.live_path(@socket, NexusWeb.ProductDeviceLive, @product_slug, @device.slug)}
+          to={Routes.live_path(@socket, NexusWeb.ProductDeviceSettingsLive, @product_slug, @device.slug)}
         >Settings</LiveRedirect>
       </div>
 

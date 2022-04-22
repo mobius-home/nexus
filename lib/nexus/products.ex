@@ -5,7 +5,8 @@ defmodule Nexus.Products do
   import Ecto.Query
 
   alias Ecto.Changeset
-  alias Nexus.Products.{Device, Tag, Metric, MetricImports, Product}
+  alias Nexus.Accounts.User
+  alias Nexus.Products.{Device, DeviceToken, Tag, Metric, MetricImports, Product}
   alias Nexus.Products.Metric.{Measurement, Upload}
   alias Nexus.{Naming, Repo, Validations}
 
@@ -94,6 +95,45 @@ defmodule Nexus.Products do
       message: "device for product already exists"
     )
     |> Repo.insert()
+  end
+
+  @doc """
+  Create a token for a device
+  """
+  @spec create_token_for_device(Device.t(), User.t()) :: {:ok, DeviceToken}
+  def create_token_for_device(device, user) do
+    token =
+      Phoenix.Token.sign(NexusWeb.Endpoint, "device", %{device_id: device.id}, max_age: :infinity)
+
+    %DeviceToken{}
+    |> Changeset.change(%{device_id: device.id, user_id: user.id, token: token})
+    |> Repo.insert()
+  end
+
+  @doc """
+  Get the token for a device
+  """
+  @spec get_token_for_device(Device.t()) :: DeviceToken.t() | nil
+  def get_token_for_device(device) do
+    query =
+      from dt in DeviceToken,
+        join: u in assoc(dt, :user),
+        where: u.id == dt.user_id,
+        where: dt.device_id == ^device.id,
+        preload: [user: u]
+
+    Repo.one(query)
+  end
+
+  @doc """
+  Revoke a token for a device
+  """
+  @spec revoke_token_for_device(Device.t()) :: :ok
+  def revoke_token_for_device(device) do
+    query = from dt in DeviceToken, where: dt.device_id == ^device.id
+
+    {1, nil} = Repo.delete_all(query)
+    :ok
   end
 
   @doc """

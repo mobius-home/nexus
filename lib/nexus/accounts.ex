@@ -49,6 +49,14 @@ defmodule Nexus.Accounts do
   end
 
   @doc """
+  Get the users full name
+  """
+  @spec user_full_name(User.t()) :: binary()
+  def user_full_name(user) do
+    "#{user.first_name} #{user.last_name}"
+  end
+
+  @doc """
   Add a user to the server
   """
   @spec add_user(User.email(), User.first_name(), User.last_name(), [add_user_opt()]) ::
