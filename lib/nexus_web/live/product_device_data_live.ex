@@ -108,7 +108,7 @@ defmodule NexusWeb.ProductDeviceDataLive do
   end
 
   def handle_event("upload_metrics", _params, socket) do
-    consume_uploaded_entries(socket, :metrics, fn %{path: path} = stuff, entry ->
+    consume_uploaded_entries(socket, :metrics, fn %{path: path}, _entry ->
       # :ok = Products.import_upload(socket.assigns.product, socket.assigns.device, path)
       :ok =
         Devices.import_metrics(
