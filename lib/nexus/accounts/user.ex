@@ -21,9 +21,9 @@ defmodule Nexus.Accounts.User do
         }
 
   schema "users" do
-    field :email, :string, null: false
-    field :first_name, :string, null: false
-    field :last_name, :string, null: false
+    field :email, :string
+    field :first_name, :string
+    field :last_name, :string
     belongs_to :role, UserRole, foreign_key: :role_id
 
     timestamps()

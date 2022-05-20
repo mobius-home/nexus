@@ -41,9 +41,9 @@ defmodule NexusWeb.Components.ProductViewContainer do
           to={Routes.live_path(@socket, NexusWeb.ProductDevicesLive, @product.slug)}
         >Devices</LiveRedirect>
         <LiveRedirect
-          class={"mr-4", "text-sm", "font-bold": @page == :metrics}
-          to={Routes.live_path(@socket, NexusWeb.ProductMetricsLive, @product.slug)}
-        >Metrics</LiveRedirect>
+          class={"mr-4", "text-sm", "font-bold": @page == :measurements}
+          to={Routes.live_path(@socket, NexusWeb.ProductMeasurementsLive, @product.slug)}
+        >Measurements</LiveRedirect>
       </div>
 
       <div class="mt-10">

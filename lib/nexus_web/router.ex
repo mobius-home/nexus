@@ -42,8 +42,7 @@ defmodule NexusWeb.Router do
       live "/:product_slug/devices", ProductDevicesLive
       live "/:product_slug/devices/new", ProductDevicesLive, :add_device
 
-      live "/:product_slug/metrics", ProductMetricsLive
-      live "/:product_slug/metrics/new", ProductMetricsLive, :add_metric
+      live "/:product_slug/measurements", ProductMeasurementsLive
 
       live "/:product_slug/devices/:device_slug", ProductDeviceLive
       live "/:product_slug/devices/:device_slug/settings", ProductDeviceSettingsLive
@@ -52,10 +51,10 @@ defmodule NexusWeb.Router do
            ProductDeviceSettingsLive,
            :gen_token
 
-      live "/:product_slug/devices/:device_slug/metrics", ProductDeviceMetricsLive
+      live "/:product_slug/devices/:device_slug/data", ProductDeviceDataLive
 
       live "/:product_slug/devices/:device_slug/metrics/upload",
-           ProductDeviceMetricsLive,
+           ProductDeviceDataLive,
            :metric_upload
     end
 

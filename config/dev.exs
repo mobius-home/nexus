@@ -6,9 +6,14 @@ config :nexus, Nexus.Repo,
   password: "db",
   hostname: "localhost",
   database: "db",
-  port: 5591,
+  port: 5597,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
+
+config :nexus, :influx,
+  port: 8085,
+  token: "devtoken",
+  org: "nexus_metrics"
 
 # For development, we disable any cache and enable
 # debugging and code reloading.

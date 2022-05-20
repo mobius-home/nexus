@@ -1,27 +1,37 @@
 import { Chart, registerables } from "chart.js";
 
 class MetricChart {
-  constructor(ctx, labels, values) {
+  constructor(ctx, labels, datasets) {
     Chart.register(...registerables);
+
+    const datasets_with_color = datasets.map(this.datasetWithColor);
 
     this.chart = new Chart(ctx, {
       type: 'line',
       data: {
         labels: labels,
-        datasets: [
-          {
-            label: "Hello",
-            data: values,
-            borderColor: "#4c51bf"
-          }
-        ],
+        datasets: datasets_with_color
       },
+      options: {
+        plugins:{   
+          legend: {
+            display: false
+          }
+        }
+      }
     })
   }
 
-  update(labels, data) {
+  update(labels, datasets) {
+    const datasets_with_color = datasets.map(this.datasetWithColor);
     this.chart.data.labels = labels;
-    this.chart.data.datasets[0].data = data;
+    this.chart.data.datasets = datasets;
+  }
+
+  datasetWithColor(dataset) {
+    dataset["borderColor"] = "#4c51bf"
+
+    return dataset
   }
 }
 

@@ -5,9 +5,8 @@ defmodule NexusWeb.ProductDeviceSettingsLive do
 
   use NexusWeb, :surface_view
 
-  alias Nexus.Accounts
+  alias Nexus.{Accounts, Devices}
   alias Nexus.Accounts.User
-  alias Nexus.Products
   alias NexusWeb.Components.DeviceViewContainer
 
   on_mount NexusWeb.UserLiveAuth
@@ -17,14 +16,14 @@ defmodule NexusWeb.ProductDeviceSettingsLive do
     socket =
       socket
       |> assign(:generated_token, nil)
-      |> assign(:token, Products.get_token_for_device(socket.assigns.device))
+      |> assign(:token, Devices.get_token(socket.assigns.device))
 
     {:ok, socket}
   end
 
   def handle_event("gen-token", _params, socket) do
     {:ok, token} =
-      Products.create_token_for_device(socket.assigns.device, socket.assigns.current_user)
+      Accounts.create_device_token(socket.assigns.current_user, socket.assigns.device)
 
     socket =
       socket
@@ -35,8 +34,12 @@ defmodule NexusWeb.ProductDeviceSettingsLive do
   end
 
   def handle_event("revoke-token", _params, socket) do
-    :ok = Products.revoke_token_for_device(socket.assigns.device)
-    socket = assign(socket, :token, nil)
+    :ok = Devices.delete_token(socket.assigns.device)
+
+    socket =
+      socket
+      |> assign(:token, nil)
+      |> assign(:generated_token, nil)
 
     {:noreply, socket}
   end

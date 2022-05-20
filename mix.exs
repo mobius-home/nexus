@@ -53,13 +53,15 @@ defmodule Nexus.MixProject do
       {:gettext, "~> 0.18"},
       {:jason, "~> 1.2"},
       {:plug_cowboy, "~> 2.5"},
+      {:surface, "~> 0.7.1"},
+      {:mobius, "~> 0.4.0"},
+      {:influx_ex, "~> 0.1.0"},
+      {:mojito, "~> 0.7.11"},
+      {:nimble_csv, "~> 1.0"},
+      # Dev deps
       {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
       {:ex_doc, "~> 0.27", only: :docs, runtime: false},
-      {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
-      {:ecto_timescaledb, "~> 0.10.0"},
-      {:vega_lite, "~> 0.1.3"},
-      {:surface, "~> 0.7.1"},
-      {:mobius, "~> 0.4.0"}
+      {:credo, "~> 1.6", only: [:dev, :test], runtime: false}
     ]
   end
 
@@ -94,14 +96,14 @@ defmodule Nexus.MixProject do
       main: "readme",
       extra_section: "GUIDES",
       source_ref: "v#{@version}",
-      skip_undefined_reference_warnings_on: ["CHANGELOG.md"],
+      skip_undefined_reference_warnings_on: ["CHANGELOG.md", "CONTRIBUTING.md"],
       groups_for_extras: groups_for_extras(),
       assets: "guides/assets",
       groups_for_modules: [
         Core: [
-          Nexus,
           Nexus.Accounts,
           Nexus.Products,
+          Nexus.Devices,
           Nexus.Products.MetricImports,
           Nexus.Repo,
           Nexus.Mailer
@@ -111,48 +113,42 @@ defmodule Nexus.MixProject do
           Nexus.Accounts.UserToken,
           Nexus.Accounts.UserRole,
           Nexus.Accounts.UserMailer,
-          Nexus.Products.Device,
-          Nexus.Products.Label,
-          Nexus.Products.Metric,
-          Nexus.Products.Product,
-          Nexus.Products.Metric.Upload,
-          Nexus.Products.Metric.Measurement,
-          Nexus.Products.Tag
+          Nexus.Device,
+          Nexus.Product,
+          Nexus.ProductSettings
         ],
         "Live Views": [
-          NexusWeb.RequestLoginLive
+          NexusWeb.RequestLoginLive,
+          NexusWeb.ProductDeviceDataLive,
+          NexusWeb.ProductDeviceLive,
+          NexusWeb.ProductDeviceSettingsLive,
+          NexusWeb.ProductDevicesLive,
+          NexusWeb.ProductLive,
+          NexusWeb.ProductMeasurementsLive,
+          NexusWeb.ProductsLive,
+          NexusWeb.ServerUsersLive
+        ],
+        Components: [
+          NexusWeb.Components.DeviceViewContainer,
+          NexusWeb.Components.ProductViewContainer,
+          NexusWeb.Components.Form,
+          NexusWeb.Components.Modal,
+          NexusWeb.Components.ModalForm,
+          NexusWeb.Components.Form.TextInput
+        ],
+        "Live Plugs": [
+          NexusWeb.GetResourceLive,
+          NexusWeb.UserLiveAuth
         ],
         "Web Controllers": [
-          NexusWeb.PageController,
-          NexusWeb.ProductController,
-          NexusWeb.ProductDeviceController,
-          NexusWeb.ProductMetricController,
-          NexusWeb.DeviceMetricController,
           NexusWeb.UserSessionController
         ],
         "Web Views": [
-          NexusWeb.PageView,
-          NexusWeb.ProductView,
-          NexusWeb.ProductDeviceView,
-          NexusWeb.ProductMetricView,
-          NexusWeb.DeviceMetricView,
           NexusWeb.UserSessionView
-        ],
-        "Web Params": [
-          NexusWeb.RequestParams,
-          NexusWeb.Params,
-          NexusWeb.Params.RequestLogin,
-          NexusWeb.RequestParams.CreateProductDeviceParams,
-          NexusWeb.RequestParams.CreateProductMetricParams,
-          NexusWeb.RequestParams.GetProductDeviceParams,
-          NexusWeb.RequestParams.MetricSlugParams,
-          NexusWeb.RequestParams.NewProductParams,
-          NexusWeb.RequestParams.ProductSlugParams,
-          NexusWeb.RequestParams.DeviceMetricUploadParams,
-          NexusWeb.RequestParams.TokenParams
         ],
         "Web Core": [
           NexusWeb,
+          NexusWeb.Params,
           NexusWeb.UserAuth,
           NexusWeb.Endpoint,
           NexusWeb.ErrorHelpers,

@@ -43,15 +43,20 @@ defmodule NexusWeb.Components.DeviceViewContainer do
       <div class="flex justify-start mt-5">
         <LiveRedirect
           class={"mr-4", "text-sm", "font-bold": @page == :overview}
-          to={Routes.live_path(@socket, NexusWeb.ProductDeviceLive, @product_slug, @device.slug)}
+          to={Routes.live_path(@socket, NexusWeb.ProductDeviceLive, @product_slug, @device.serial_number)}
         >Overview</LiveRedirect>
         <LiveRedirect
           class={"mr-4", "text-sm", "font-bold": @page == :metrics}
-          to={Routes.live_path(@socket, NexusWeb.ProductDeviceMetricsLive, @product_slug, @device.slug)}
-        >Metrics</LiveRedirect>
+          to={Routes.live_path(@socket, NexusWeb.ProductDeviceDataLive, @product_slug, @device.serial_number)}
+        >Data</LiveRedirect>
         <LiveRedirect
           class={"mr-4", "text-sm", "font-bold": @page == :settings}
-          to={Routes.live_path(@socket, NexusWeb.ProductDeviceSettingsLive, @product_slug, @device.slug)}
+          to={Routes.live_path(
+            @socket,
+            NexusWeb.ProductDeviceSettingsLive,
+            @product_slug,
+            @device.serial_number
+          )}
         >Settings</LiveRedirect>
       </div>
 

@@ -7,7 +7,7 @@ defmodule Nexus.Accounts do
 
   alias Ecto.Changeset
   alias Nexus.Accounts.{User, UserMailer, UserRole, UserToken}
-  alias Nexus.Repo
+  alias Nexus.{Device, DeviceToken, Repo}
   alias Swoosh.Email
 
   @rand_size 32
@@ -277,5 +277,21 @@ defmodule Nexus.Accounts do
   @doc false
   def decode_token!(token) do
     Base.url_decode64!(token, padding: false)
+  end
+
+  @doc """
+  A user to create a token a device
+  """
+  @spec create_device_token(User.t(), Device.t()) ::
+          {:ok, DeviceToken.t()} | {:error, Changeset.t()}
+  def create_device_token(user, device) do
+    # decouple NexusWeb here
+    token =
+      Phoenix.Token.sign(NexusWeb.Endpoint, "device", %{device_id: device.id}, max_age: :infinity)
+
+    device
+    |> Ecto.build_assoc(:device_token)
+    |> Changeset.change(%{user_id: user.id, token: token})
+    |> Repo.insert()
   end
 end

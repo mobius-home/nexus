@@ -15,7 +15,7 @@ to generate and see how to work with Nexus.
 
 ### System requirements
 
-* Docker or Timescale DB
+* Docker or PosgreSQL and InfluxDB
 * Elixir 1.12+
 * Erlang OTP 24+
 * Elixir Phoenix 1.6+
@@ -29,14 +29,32 @@ to generate and see how to work with Nexus.
 gh clone
 ```
 
-#### Timescale DB
+#### Databases
 
 If you're using Docker you can use the provided `docker-compose.yml` file to up
-and running quickly with Timescale DB by running:
+and running quickly with the databases by running:
 
 ```bash
-docket-compose up -d
+docker-compose up -d
 ```
+
+By default `config/dev.exs` is configured to work with the docker configuration.
+If you want to provide your own instances of either Postgres or InfluxDB you
+will to set the appropriate configuration values in your config file.
+
+To configure InfluxDB you are required to configure the token and org:
+
+```elixir
+config :nexus, :influx, token: "mytoken", org: "myorg"
+```
+
+If you do not provide at minium those fields Nexus wont start.
+
+Other configuration fields for Infux are: `:port`, `:host`, and `:org_id`.
+
+The `:org_id` is required to talk to some InfluxDB API endpoints, so if you do
+not provide that configuration parameter Nexus will try to resolve that on
+start.
 
 #### Elixir and phoenix
 

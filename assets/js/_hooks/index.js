@@ -16,13 +16,14 @@ export default {
 
   MetricChart: {
     mounted() {
-      const { labels, data } = JSON.parse(this.el.dataset.measurements);
-      this.chart = new MetricChart(this.el, labels, data);
+      const {labels, datasets} = JSON.parse(this.el.dataset.dataseries);
+      this.chart = new MetricChart(this.el, labels, datasets);
     },
 
     updated() {
-      const { labels, data } = JSON.parse(this.el.dataset.measurements);
-      this.chart.update(labels, data);
+      const { labels, datasets } = JSON.parse(this.el.dataset.dataseries);
+      console.log(datasets)
+      this.chart.update(labels, datasets);
     }
   }
 }

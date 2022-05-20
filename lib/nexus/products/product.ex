@@ -1,50 +1,32 @@
 defmodule Nexus.Products.Product do
   @moduledoc """
-  A product
-
-  A product is the fundamental building block the Nexus server. It provides a
-  namespace for devices and allows the backend to optimize metric data for a
-  fleet of devices within a product.
+  An IoT product
   """
 
   use Ecto.Schema
 
-  alias Nexus.Products.{Device, Metric, Tag, TagProduct}
+  alias Nexus.Devices.Device
+  alias Nexus.Products.ProductSettings
 
-  @typedoc """
-  The name of the product
-
-  This name is normally used for contexts for when a human will be the end
-  user.
-  """
   @type name() :: binary()
 
-  @typedoc """
-  A slug of the product name
-
-  This name is mostly used for URLs and APIs to search for product records. This
-  should only be programmatically generated.
-  """
   @type slug() :: binary()
 
-  @typedoc """
-  Schema for where the metrics data for the product will live
-  """
-  @type data_schema() :: binary()
+  @type data_bucket() :: binary()
 
   @type t() :: %__MODULE__{
-          name: name(),
-          slug: slug(),
-          data_schema: data_schema()
+          name: binary(),
+          slug: binary(),
+          product_settings: ProductSettings.t() | Ecto.Association.NotLoaded.t(),
+          devices: [Device.t()] | Ecto.Association.NotLoaded.t()
         }
 
   schema "products" do
+    field :name, :string
+    field :slug, :string
+
+    has_one :product_settings, ProductSettings
     has_many :devices, Device
-    has_many :metrics, Metric
-    many_to_many :tags, Tag, join_through: TagProduct
-    field :name, :string, null: false
-    field :slug, :string, null: false
-    field :data_schema, :string, null: false
 
     timestamps()
   end

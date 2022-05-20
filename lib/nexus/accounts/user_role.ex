@@ -12,6 +12,6 @@ defmodule Nexus.Accounts.UserRole do
         }
 
   schema "user_roles" do
-    field :name, :string, null: false
+    field :name, :string
   end
 end

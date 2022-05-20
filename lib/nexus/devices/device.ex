@@ -1,29 +1,25 @@
-defmodule Nexus.Products.Device do
+defmodule Nexus.Devices.Device do
   @moduledoc """
 
   """
+
   use Ecto.Schema
 
+  alias Nexus.Devices.DeviceToken
   alias Nexus.Products.Product
 
   @type serial_number() :: binary()
 
-  @type slug() :: binary()
-
   @type t() :: %__MODULE__{
           serial_number: serial_number(),
           product: Product.t() | Ecto.Association.NotLoaded.t(),
-          id: integer(),
-          slug: slug()
+          device_token: DeviceToken.t() | Ecto.Association.NotLoaded.t()
         }
 
-  @primary_key false
   schema "devices" do
-    belongs_to :product, Product, primary_key: true
-    field :serial_number, :string, primary_key: true
-    field :id, :integer
-
-    field :slug, :string, null: false
+    belongs_to :product, Product
+    field :serial_number, :string
+    has_one :device_token, DeviceToken
 
     timestamps()
   end

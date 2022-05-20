@@ -79,7 +79,6 @@ Nexus. However, we do want to write as many tests where it makes sense. A good
 question to ask when writing a test is, "am I just testing functions from
 another library?"
 
-
 ### Local is preferred
 
 When it comes to some items such as plugs and types, we should opt for the most
@@ -109,41 +108,7 @@ This allows us to develop the `Nexus` library separate from the demands of the
 interface and we can put request validations at the interface layer and database
 validations in the core `Nexus` layer.
 
-The module `NexusWeb.RequestParams` contains a protocol that will allow the
-controller to bind the incoming params to a known data structure that can be
-well documented and tested. This is opposite of passing `map()` to all context
-functions. The idea of binding comes from Go's Gin web framework, you can read
-more about it [here](https://chenyitian.gitbooks.io/gin-web-framework/content/docs/17.html).
+You can see more documentation about request params in `NexusWeb.Params`.
 
 We know this is different, but we hope as this area of the code evolves it will
 help maintainability long term.
-
-### Database design
-
-Nexus uses Timescale DB, which is an extension for time series data on top of
-PostgreSQL. There are many reasons for choosing this database but two we find
-really compelling is:
-
-At the end of the day it is just Postgres with some extra functionality. This
-allows quicker knowledge transfer for developers, admins, and ops teams coming
-from Postgres. All that hard earned experience can be applied to Timescale.
-
-Since it is just Postgres, it can operate as both the time series database and
-as the application database.
-
-#### Dynamic hypertables
-
-Timescale provides us with functionality for something they call hypertables.
-These are special tables that are built to handle the unique demands of time
-series data both for ingestion and querying.
-
-When you create a new product in Nexus, it will be given its only schema for
-these hypertables in the form of `<product_name>_data`. In this schema, as a new
-metric is added a product we generate a table by the metric's name in this
-schema and set some rules on it to help with the loose time ordering metrics are
-pushed from devices.
-
-Some of the ideas found in this implementation where inspired by the
-[promscale](https://docs.google.com/document/d/1e3mAN3eHUpQ2JHDvnmkmn_9rFyqyYisIgdtgd3D1MHA/edit#)
-design document provided by Timescale.
-

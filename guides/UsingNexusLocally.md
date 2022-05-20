@@ -7,9 +7,7 @@ For either development and testing you might want to run Nexus locally.
 1. Elixir 1.12+
 1. Erlang OTP 24+
 1. Phoenix 1.6+
-1. Docker or an instance of Timescale DB
-
-If you are using docker for your Timescale DB in the project directory run:
+1. Docker or an instance of PostgreSQL and an instance of InfluxDB
 
 ## Up and running
 
@@ -25,10 +23,10 @@ mix deps.get
 docker-compose up -d
 ```
 
-Otherwise you will need to configure the Timescale DB in the the config files
-for your environment.
+Otherwise you will need to configure the Postgres and Influx in the the config
+files for your environment.
 
-After you database is running and configured correctly (if you're using docker
+After you databases are running and configured correctly (if you're using docker
 the configuration is already setup) you should run:
 
 ```
