@@ -122,6 +122,15 @@ defmodule Nexus.Influx do
     )
   end
 
+  def write_points(bucket, points, opts \\ []) do
+    with_client(
+      fn client ->
+        InfluxEx.write(client, bucket, points, opts)
+      end,
+      opts
+    )
+  end
+
   defp with_client(func, opts) do
     client = new_client(opts)
 

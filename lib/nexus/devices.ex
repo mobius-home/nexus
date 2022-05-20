@@ -114,7 +114,18 @@ defmodule Nexus.Devices do
     :ok
   end
 
-  def import_metrics() do
+  @doc """
+  Import metrics for a device
+  """
+  @spec import_metrics(Device.t(), Path.t(), ProductSettings.t()) :: :ok
+  def import_metrics(device, path, product_settings) do
+    content = File.read!(path)
+    {:ok, data} = Mobius.Exports.parse_mbf(content)
+
+    Nexus.DataImport.run(product_settings.bucket_name, data, %{
+      device_serial: device.serial_number
+    })
+
     :ok
   end
 end
