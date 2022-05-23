@@ -55,8 +55,9 @@ defmodule Nexus.MixProject do
       {:plug_cowboy, "~> 2.5"},
       {:surface, "~> 0.7.1"},
       {:mobius, "~> 0.4.0"},
-      {:influx_ex, "~> 0.1.0"},
-      {:mojito, "~> 0.7.11"},
+      {:influx_ex, "~> 0.2.0"},
+      # {:influx_ex, path: "../../influx_ex", override: true},
+      {:req, "~> 0.2.2"},
       {:nimble_csv, "~> 1.0"},
       # Dev deps
       {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
