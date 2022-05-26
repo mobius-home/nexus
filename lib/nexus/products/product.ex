@@ -6,7 +6,7 @@ defmodule Nexus.Products.Product do
   use Ecto.Schema
 
   alias Nexus.Devices.Device
-  alias Nexus.Products.ProductSettings
+  alias Nexus.Products.{ProductSettings, ProductToken}
 
   @type name() :: binary()
 
@@ -18,7 +18,8 @@ defmodule Nexus.Products.Product do
           name: binary(),
           slug: binary(),
           product_settings: ProductSettings.t() | Ecto.Association.NotLoaded.t(),
-          devices: [Device.t()] | Ecto.Association.NotLoaded.t()
+          devices: [Device.t()] | Ecto.Association.NotLoaded.t(),
+          product_token: ProductToken.t() | Ecto.Association.NotLoaded.t()
         }
 
   schema "products" do
@@ -27,6 +28,7 @@ defmodule Nexus.Products.Product do
 
     has_one :product_settings, ProductSettings
     has_many :devices, Device
+    has_one :product_token, ProductToken
 
     timestamps()
   end

@@ -44,6 +44,8 @@ defmodule NexusWeb.Router do
 
       live "/:product_slug/measurements", ProductMeasurementsLive
 
+      live "/:product_slug/settings", ProductSettingsLive
+
       live "/:product_slug/devices/:device_slug", ProductDeviceLive
       live "/:product_slug/devices/:device_slug/settings", ProductDeviceSettingsLive
 
@@ -63,6 +65,14 @@ defmodule NexusWeb.Router do
       live "/users", ServerUsersLive
       live "/users/new", ServerUsersLive, :add_user
     end
+  end
+
+  scope "/api/v1", NexusWeb.API do
+    pipe_through :api
+
+    post "/products/:product_slug/devices/:device_serial/metrics",
+         DeviceMetricsController,
+         :post_metrics
   end
 
   # Other scopes may use custom stacks.

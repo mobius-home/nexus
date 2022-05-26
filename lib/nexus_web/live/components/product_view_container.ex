@@ -8,7 +8,7 @@ defmodule NexusWeb.Components.ProductViewContainer do
 
   prop product, :struct, required: true
   prop socket, :struct, required: true
-  prop page, :atom, required: true, values: [:overview, :devices, :metrics]
+  prop page, :atom, required: true, values: [:overview, :devices, :metrics, :settings]
 
   prop modal_button_label, :string
   prop modal_button_to, :string
@@ -44,6 +44,10 @@ defmodule NexusWeb.Components.ProductViewContainer do
           class={"mr-4", "text-sm", "font-bold": @page == :measurements}
           to={Routes.live_path(@socket, NexusWeb.ProductMeasurementsLive, @product.slug)}
         >Measurements</LiveRedirect>
+        <LiveRedirect
+          class={"mr-4", "text-sm", "font-bold": @page == :settings}
+          to={Routes.live_path(@socket, NexusWeb.ProductSettingsLive, @product.slug)}
+        >Settings</LiveRedirect>
       </div>
 
       <div class="mt-10">

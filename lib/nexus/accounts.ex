@@ -7,7 +7,9 @@ defmodule Nexus.Accounts do
 
   alias Ecto.Changeset
   alias Nexus.Accounts.{User, UserMailer, UserRole, UserToken}
-  alias Nexus.{Device, DeviceToken, Repo}
+  alias Nexus.Products
+  alias Nexus.Products.{Product, ProductToken}
+  alias Nexus.Repo
   alias Swoosh.Email
 
   @rand_size 32
@@ -293,5 +295,30 @@ defmodule Nexus.Accounts do
     |> Ecto.build_assoc(:device_token)
     |> Changeset.change(%{user_id: user.id, token: token})
     |> Repo.insert()
+  end
+
+  @doc """
+  Create a product token
+  """
+  @spec create_product_token(User.t(), Product.t()) ::
+          {:ok, ProductToken.t()} | {:error, Changeset.t()}
+  def create_product_token(user, product) do
+    # decouple NexusWeb here
+    token =
+      Phoenix.Token.sign(NexusWeb.Endpoint, "product", %{product_id: product.id},
+        max_age: :infinity
+      )
+
+    insert_result =
+      product
+      |> Ecto.build_assoc(:product_token)
+      |> Changeset.change(%{creator_id: user.id, token: token})
+      |> Changeset.unique_constraint(:product_id)
+      |> Repo.insert()
+
+    case insert_result do
+      {:ok, token} -> {:ok, Products.load_token_creator(token)}
+      error -> error
+    end
   end
 end

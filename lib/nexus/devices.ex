@@ -128,4 +128,29 @@ defmodule Nexus.Devices do
 
     :ok
   end
+
+  def get_device_token_by_token(token) do
+    query =
+      from dt in DeviceToken,
+        join: d in assoc(dt, :device),
+        where: dt.device_id == d.id,
+        where: dt.token == ^token,
+        preload: [device: d]
+
+    case Repo.one(query) do
+      %DeviceToken{} = dt ->
+        :ok = update_device_token_last_used(dt)
+        dt
+    end
+  end
+
+  defp update_device_token_last_used(device_token) do
+    query =
+      from dt in DeviceToken,
+        where: dt.token == ^device_token.token
+
+    {1, _} = Repo.update_all(query, set: [last_used: NaiveDateTime.utc_now()])
+
+    :ok
+  end
 end

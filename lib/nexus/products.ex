@@ -9,7 +9,7 @@ defmodule Nexus.Products do
   alias InfluxEx.ConflictError
   alias Nexus.Devices.Device
   alias Nexus.{Influx, Repo, Slug}
-  alias Nexus.Products.{Product, ProductSettings}
+  alias Nexus.Products.{Product, ProductSettings, ProductToken}
 
   @doc """
   Create a new product
@@ -167,5 +167,27 @@ defmodule Nexus.Products do
   @spec get_measurement_fields(Product.t(), binary()) :: {:ok, [binary()]} | {:error, term()}
   def get_measurement_fields(product, measurement) do
     Influx.get_measurement_fields(product.product_settings.bucket_name, measurement)
+  end
+
+  @doc """
+  Get the token for a product
+  """
+  @spec get_token(Product.t()) :: ProductToken.t() | nil
+  def get_token(product) do
+    query =
+      from pt in ProductToken,
+        where: pt.product_id == ^product.id,
+        join: c in assoc(pt, :creator),
+        preload: [creator: c]
+
+    Repo.one(query)
+  end
+
+  def delete_token(product_token) do
+    Repo.delete(product_token)
+  end
+
+  def load_token_creator(product_token) do
+    Repo.preload(product_token, [:creator])
   end
 end
