@@ -183,10 +183,18 @@ defmodule Nexus.Products do
     Repo.one(query)
   end
 
+  @doc """
+  Delete a product token
+  """
+  @spec delete_token(ProductToken.t()) :: {:ok, ProductToken.t()} | {:error, Changeset.t()}
   def delete_token(product_token) do
     Repo.delete(product_token)
   end
 
+  @doc """
+  Load the token creator association into `:creator` field
+  """
+  @spec load_token_creator(ProductToken.t()) :: ProductToken.t()
   def load_token_creator(product_token) do
     Repo.preload(product_token, [:creator])
   end
