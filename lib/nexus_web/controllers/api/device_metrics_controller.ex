@@ -28,6 +28,11 @@ defmodule NexusWeb.API.DeviceMetricsController do
          _ <-
            Devices.import_metrics(device, metrics, product, type: :mbf_binary) do
       render(conn, "index.json")
+    else
+      {:error, :missing_token} ->
+        conn
+        |> put_status(401)
+        |> halt()
     end
   end
 
