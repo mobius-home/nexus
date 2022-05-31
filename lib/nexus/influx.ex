@@ -111,7 +111,6 @@ defmodule Nexus.Influx do
           |> Flux.tag("device_serial", device.serial_number)
           |> Flux.aggregate_window(aggregate_interval, create_empty: true)
           |> Flux.fill_value_previous()
-          |> tap(fn f -> IO.inspect(to_string(f)) end)
           |> Flux.run_query(client)
 
         case result do
