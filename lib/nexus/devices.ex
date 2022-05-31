@@ -9,7 +9,8 @@ defmodule Nexus.Devices do
   alias Nexus.Devices.{Device, DeviceToken}
   alias Nexus.Products.ProductSettings
 
-  @type get_data_opt() :: {:resolution, :hour | :day | :week | :month}
+  @type get_data_opt() ::
+          {:resolution, :hour | :day | :week | :month} | {:window, {pos_integer(), pos_integer()}}
 
   @type get_devices_opt() :: {:product_id, pos_integer()}
 
@@ -61,29 +62,28 @@ defmodule Nexus.Devices do
   """
   @spec get_measurement_data(Device.t(), ProductSettings.bucket_name(), binary(), binary(), [
           get_data_opt()
-        ]) :: {:ok, [DataSeries.t()]} | {:error, term()}
+        ]) :: {:ok, DataSeries.t()} | {:error, term()}
   def get_measurement_data(device, bucket_name, measurement, field, opts \\ []) do
-    {past, every} = get_resolution(opts)
+    {start_ts, end_ts} = opts[:window]
+    every = get_resolution(opts)
 
     Influx.get_device_dataseries(device, bucket_name, measurement, field,
-      start: past,
+      start: start_ts,
+      end: end_ts,
       aggregate_interval: every
     )
   end
 
   defp get_resolution(opts) do
     case opts[:resolution] do
+      :minute ->
+        "1m"
+
       :hour ->
-        {"-1h", "1m"}
+        "1h"
 
       :day ->
-        {"-24h", "1h"}
-
-      :week ->
-        {"-7d", "1h"}
-
-      :month ->
-        {"-1m", "1h"}
+        "1d"
     end
   end
 
@@ -116,17 +116,40 @@ defmodule Nexus.Devices do
 
   @doc """
   Import metrics for a device
-  """
-  @spec import_metrics(Device.t(), Path.t(), ProductSettings.t()) :: :ok
-  def import_metrics(device, path, product_settings) do
-    content = File.read!(path)
-    {:ok, data} = Mobius.Exports.parse_mbf(content)
 
-    Nexus.DataImport.run(product_settings.bucket_name, data, %{
+  Nexus has first class for the Mobius Binary Format produced by the the
+  `:mobius` library.
+  """
+  @spec import_metrics(Device.t(), Path.t() | binary(), Product.t(), keyword()) :: :ok
+  def import_metrics(device, path_or_data, product, opts \\ []) do
+    import_type = opts[:type] || :mbf_file
+    mbf = get_mbf(import_type, path_or_data)
+
+    {:ok, data} = Mobius.Exports.parse_mbf(mbf)
+
+    Nexus.DataImport.run(product.product_settings.bucket_name, data, %{
       device_serial: device.serial_number
     })
 
+    broadcast_device_metrics_uploaded(device.serial_number, product.slug)
+
     :ok
+  end
+
+  def broadcast_device_metrics_uploaded(device_serial, product_slug) do
+    Phoenix.PubSub.broadcast(Nexus.PubSub, "#{product_slug}:#{device_serial}", :new_metrics)
+  end
+
+  def subscribe_device_metrics_uploaded(device_serial, product_slug) do
+    Phoenix.PubSub.subscribe(Nexus.PubSub, "#{product_slug}:#{device_serial}")
+  end
+
+  defp get_mbf(:mbf_file, location) do
+    File.read!(location)
+  end
+
+  defp get_mbf(:mbf_binary, binary) do
+    binary
   end
 
   def get_device_token_by_token(token) do

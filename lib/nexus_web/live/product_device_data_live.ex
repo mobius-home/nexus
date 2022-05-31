@@ -15,21 +15,28 @@ defmodule NexusWeb.ProductDeviceDataLive do
   @resolution_names ["Last hour", "Last 24 hour", "Last 7 days", "Last 30 days"]
 
   @resolutions Enum.reduce(@resolution_names, %{}, fn
-                 "Last hour" = name, table -> Map.put(table, name, :hour)
-                 "Last 24 hour" = name, table -> Map.put(table, name, :day)
-                 "Last 7 days" = name, table -> Map.put(table, name, :week)
-                 "Last 30 days" = name, table -> Map.put(table, name, :month)
+                 "Last hour" = name, table -> Map.put(table, name, :minute)
+                 "Last 24 hour" = name, table -> Map.put(table, name, :hour)
+                 "Last 7 days" = name, table -> Map.put(table, name, :hour)
+                 "Last 30 days" = name, table -> Map.put(table, name, :day)
                end)
 
   on_mount(NexusWeb.UserLiveAuth)
   on_mount({NexusWeb.GetResourceLive, [:product, :device, :product_measurements]})
 
   def mount(_params, _session, socket) do
+    Devices.subscribe_device_metrics_uploaded(
+      socket.assigns.device.serial_number,
+      socket.assigns.product.slug
+    )
+
     socket =
       socket
       |> assign(:query_params, %{resolution: "Last hour"})
       |> assign(:measurement_fields, [])
       |> assign(:data_series, DataSeries.empty())
+      |> assign(:data_series_payload, nil)
+      |> assign(:last_data_fetched_at, nil)
       |> allow_upload(:metrics, accept: ~w(.mbf .json), max_entries: 1)
 
     {:ok, socket}
@@ -53,10 +60,10 @@ defmodule NexusWeb.ProductDeviceDataLive do
     end
   end
 
-  defp maybe_fetch_data(socket) do
+  defp maybe_fetch_data(socket, opts \\ []) do
     query_params = socket.assigns.query_params
 
-    case which_data(socket.assigns) do
+    case which_data(socket.assigns, opts) do
       :none ->
         socket
 
@@ -69,30 +76,81 @@ defmodule NexusWeb.ProductDeviceDataLive do
         maybe_fetch_data(socket)
 
       :measurement_data ->
+        {_, now} = window = get_query_window(socket)
+
         {:ok, data_series} =
           Devices.get_measurement_data(
             socket.assigns.device,
             socket.assigns.product.product_settings.bucket_name,
             query_params.measurement,
             query_params.field,
+            window: window,
             resolution: @resolutions[query_params[:resolution]]
           )
 
-        assign(socket, :data_series, data_series)
+        payload =
+          if opts[:refresh] do
+            Jason.encode!(%{
+              action: "update",
+              labels: data_series.labels,
+              datasets: data_series.datasets
+            })
+          else
+            Jason.encode!(%{
+              action: "newMetric",
+              labels: data_series.labels,
+              datasets: data_series.datasets
+            })
+          end
+
+        socket
+        |> assign(:data_series, data_series)
+        |> assign(:data_series_payload, payload)
+        |> assign(:last_data_fetched_at, now)
     end
   end
 
-  defp which_data(%{
-         query_params: query_params,
-         measurement_fields: fields,
-         data_series: data_series
-       }) do
+  defp get_query_window(%{assigns: %{last_data_fetched_at: nil}}) do
+    now_seconds = now()
+
+    # {start, end}
+    {now_seconds - 3600, now_seconds}
+  end
+
+  defp get_query_window(socket) do
+    start_at = socket.assigns.last_data_fetched_at
+
+    # {start, end}
+    {start_at, now()}
+  end
+
+  defp now() do
+    dt = DateTime.utc_now()
+    dt = %{dt | second: 0}
+
+    DateTime.to_unix(dt)
+  end
+
+  defp which_data(
+         %{
+           query_params: query_params,
+           measurement_fields: fields,
+           data_series: data_series
+         },
+         opts
+       ) do
+    refresh = opts[:refresh] || false
+
     cond do
       query_params[:measurement] && !query_params[:field] && Enum.empty?(fields) ->
         :fields
 
       query_params[:measurement] && query_params[:field] && Enum.empty?(fields) ->
         :fields
+
+      query_params[:measurement] && query_params[:field] && !Enum.empty?(fields) &&
+        !DataSeries.empty?(data_series) && refresh ->
+        :measurement_data
 
       query_params[:measurement] && query_params[:field] && !Enum.empty?(fields) &&
           DataSeries.empty?(data_series) ->
@@ -109,12 +167,11 @@ defmodule NexusWeb.ProductDeviceDataLive do
 
   def handle_event("upload_metrics", _params, socket) do
     consume_uploaded_entries(socket, :metrics, fn %{path: path}, _entry ->
-      # :ok = Products.import_upload(socket.assigns.product, socket.assigns.device, path)
       :ok =
         Devices.import_metrics(
           socket.assigns.device,
           path,
-          socket.assigns.product.product_settings
+          socket.assigns.product
         )
 
       {:ok, :done}
@@ -203,6 +260,12 @@ defmodule NexusWeb.ProductDeviceDataLive do
     end
   end
 
+  def handle_info(:new_metrics, socket) do
+    socket = maybe_fetch_data(socket, refresh: true)
+
+    {:noreply, socket}
+  end
+
   def render(assigns) do
     ~F"""
     <DeviceViewContainer
@@ -274,13 +337,13 @@ defmodule NexusWeb.ProductDeviceDataLive do
 
       {#if Map.get(@query_params, :measurement) == nil}
         <p class="text-center text-gray-500 pt-20">Please select a metric</p>
-      {#elseif DataSeries.empty?(@data_series)}
+      {#elseif @data_series_payload == nil}
         <p class="text-center text-gray-500 pt-20">No metrics reported in time frame</p>
       {#else}
         <canvas
           id="chart"
           phx-hook="MetricChart"
-          data-dataseries={prepare_data_series(@data_series)}
+          data-dataseries={@data_series_payload}
           class="max-h-[500px]"
         >
         </canvas>
@@ -314,12 +377,6 @@ defmodule NexusWeb.ProductDeviceDataLive do
   defp get_selected_field(%{field: field}), do: "#{field}"
   defp get_selected_field(_), do: ""
 
-  defp prepare_data_series(data_series) do
-    data_series
-    |> Map.from_struct()
-    |> Jason.encode!()
-  end
-
   defp resolution_names(), do: @resolution_names
 
   defp update_query_params(socket, params) do
@@ -328,5 +385,6 @@ defmodule NexusWeb.ProductDeviceDataLive do
     socket
     |> assign(:query_params, new_params)
     |> assign(:data_series, DataSeries.empty())
+    |> assign(:last_data_fetched_at, nil)
   end
 end

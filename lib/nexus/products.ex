@@ -9,7 +9,7 @@ defmodule Nexus.Products do
   alias InfluxEx.ConflictError
   alias Nexus.Devices.Device
   alias Nexus.{Influx, Repo, Slug}
-  alias Nexus.Products.{Product, ProductSettings, ProductToken}
+  alias Nexus.Products.{Product, ProductSettings, ProductToken, Queries}
 
   @doc """
   Create a new product
@@ -70,10 +70,10 @@ defmodule Nexus.Products do
   @spec get_by_slug(binary()) :: Product.t() | nil
   def get_by_slug(product_slug) do
     query =
-      from p in Product,
-        join: ps in assoc(p, :product_settings),
-        where: p.slug == ^product_slug,
-        preload: [product_settings: ps]
+      Queries.from_products()
+      |> Queries.join_product_settings()
+      |> Queries.where_product_slug(product_slug)
+      |> preload([product_settings: ps], product_settings: ps)
 
     Repo.one(query)
   end
@@ -115,8 +115,9 @@ defmodule Nexus.Products do
   """
   @spec get_product_settings_by_product_id(integer()) :: ProductSettings.t() | nil
   def get_product_settings_by_product_id(product_id) do
-    query = from ps in ProductSettings, where: ps.product_id == ^product_id
-    Repo.one(query)
+    Queries.from_product_settings()
+    |> Queries.where_product_settings_for_product_id(product_id)
+    |> Repo.one()
   end
 
   @doc """
@@ -197,5 +198,33 @@ defmodule Nexus.Products do
   @spec load_token_creator(ProductToken.t()) :: ProductToken.t()
   def load_token_creator(product_token) do
     Repo.preload(product_token, [:creator])
+  end
+
+  @type product_token_verify_func() :: (binary() -> {:ok, Product.id()} | {:error, :invalid})
+
+  @doc """
+  """
+  def verity_token_and_fetch_product(product_slug, token, verifer) do
+    with {:ok, product_id} <- verifer.(token),
+         %Product{} = product <- fetch_product_with_token(product_id, product_slug, token) do
+      {:ok, product}
+    else
+      _error -> {:error, :invalid}
+    end
+  end
+
+  defp fetch_product_with_token(product_id, product_slug, token) do
+    Queries.from_products()
+    |> Queries.join_product_settings()
+    |> Queries.join_product_token()
+    |> Queries.join_product_token_creator()
+    |> Queries.where_product_id(product_id)
+    |> Queries.where_product_slug(product_slug)
+    |> Queries.where_product_token(token)
+    |> preload([product_settings: ps, product_token: pt, product_token_creator: tc],
+      product_settings: ps,
+      product_token: {pt, [creator: tc]}
+    )
+    |> Repo.one()
   end
 end

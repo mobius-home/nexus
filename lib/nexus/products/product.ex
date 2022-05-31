@@ -14,7 +14,10 @@ defmodule Nexus.Products.Product do
 
   @type data_bucket() :: binary()
 
+  @type id() :: pos_integer()
+
   @type t() :: %__MODULE__{
+          id: id(),
           name: binary(),
           slug: binary(),
           product_settings: ProductSettings.t() | Ecto.Association.NotLoaded.t(),

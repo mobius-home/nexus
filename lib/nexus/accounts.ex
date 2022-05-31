@@ -25,6 +25,14 @@ defmodule Nexus.Accounts do
   @type session_token() :: binary()
 
   @typedoc """
+  A function that produces a signed token for a product
+
+  This function receives a product and is expect to output a signed token for a
+  product.
+  """
+  @type product_token_signer_func() :: (Product.t() -> binary())
+
+  @typedoc """
 
   """
   @type add_user_opt() :: {:role, UserRole.t()}
@@ -300,14 +308,10 @@ defmodule Nexus.Accounts do
   @doc """
   Create a product token
   """
-  @spec create_product_token(User.t(), Product.t()) ::
+  @spec create_product_token(User.t(), Product.t(), product_token_signer_func()) ::
           {:ok, ProductToken.t()} | {:error, Changeset.t()}
-  def create_product_token(user, product) do
-    # decouple NexusWeb here
-    token =
-      Phoenix.Token.sign(NexusWeb.Endpoint, "product", %{product_id: product.id},
-        max_age: :infinity
-      )
+  def create_product_token(user, product, product_token_signer_func) do
+    token = product_token_signer_func.(product)
 
     insert_result =
       product

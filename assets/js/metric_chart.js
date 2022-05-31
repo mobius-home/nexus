@@ -23,11 +23,35 @@ class MetricChart {
   }
 
   update(labels, datasets) {
-    const datasets_with_color = datasets.map(this.datasetWithColor);
+    datasets.map(this.datasetWithColor);
+
     this.chart.data.labels = labels;
     this.chart.data.datasets = datasets;
   }
 
+  updateTwo(labels, datasets) {
+    this.updateChartLabels(this.chart, labels);
+    this.updateChartDatasets(this.chart, datasets);
+
+    this.chart.update();
+  }
+
+  updateChartLabels(chart, labels) {
+    labels.forEach(label => chart.data.labels.push(label));
+  }
+
+  updateChartDatasets(chart, datasets) {
+    datasets.forEach(dataset => {
+      this.updateChartDataset(chart, dataset.label, dataset.data)
+    })
+  }
+
+  updateChartDataset(chart, label, datas) {
+    datas.forEach(dataPoint => {
+      chart.data.datasets[label].data.push(dataPoint);
+    });
+  }
+    
   datasetWithColor(dataset) {
     dataset["borderColor"] = "#4c51bf"
 

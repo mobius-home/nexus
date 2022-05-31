@@ -3,7 +3,7 @@ defmodule NexusWeb.ProductSettingsLive do
 
   alias Nexus.{Accounts, Products}
   alias NexusWeb.Components.ProductViewContainer
-  alias NexusWeb.GetResourceLive
+  alias NexusWeb.{GetResourceLive, Tokens}
 
   on_mount NexusWeb.UserLiveAuth
   on_mount {GetResourceLive, :product}
@@ -20,7 +20,11 @@ defmodule NexusWeb.ProductSettingsLive do
   end
 
   def handle_event("generate-token", _params, socket) do
-    case Accounts.create_product_token(socket.assigns.current_user, socket.assigns.product) do
+    case Accounts.create_product_token(
+           socket.assigns.current_user,
+           socket.assigns.product,
+           &Tokens.product_token_signer/1
+         ) do
       {:ok, token} ->
         socket =
           socket

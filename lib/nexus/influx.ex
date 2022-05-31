@@ -12,7 +12,11 @@ defmodule Nexus.Influx do
           | {:org, InfluxEx.org_name()}
           | {:org_id, InfluxEx.org_id()}
 
-  @type device_query_opt() :: {:start, binary()} | {:aggregate_interval, binary()} | opt()
+  @type device_query_opt() ::
+          {:start, pos_integer()}
+          | {:end, pos_integer()}
+          | {:aggregate_interval, binary()}
+          | opt()
 
   @doc """
   Create a bucket in InfluxDB
@@ -94,14 +98,14 @@ defmodule Nexus.Influx do
           device_query_opt()
         ]) :: {:ok, [DataSeries.t()]} | {:error, term()}
   def get_device_dataseries(device, bucket_name, measurement, field, opts \\ []) do
-    start = opts[:start] || "-1h"
+    {start, stop} = get_query_window(opts)
     aggregate_interval = opts[:aggregate_interval] || "1m"
 
     with_client(
       fn client ->
         result =
           Flux.from(bucket_name)
-          |> Flux.range(start)
+          |> Flux.range(start, stop)
           |> Flux.measurement(measurement)
           |> Flux.field(field)
           |> Flux.tag("device_serial", device.serial_number)
@@ -120,6 +124,17 @@ defmodule Nexus.Influx do
       end,
       opts
     )
+  end
+
+  defp get_query_window(opts) do
+    start = opts[:start]
+    stop = opts[:end]
+
+    if stop - start == 0 do
+      {start, nil}
+    else
+      {start, stop}
+    end
   end
 
   def write_points(bucket, points, opts \\ []) do

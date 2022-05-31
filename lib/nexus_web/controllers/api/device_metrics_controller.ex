@@ -4,19 +4,29 @@ defmodule NexusWeb.API.DeviceMetricsController do
   """
   use NexusWeb, :controller
 
-  alias Nexus.Devices
-  alias Nexus.Devices.DeviceToken
-  alias NexusWeb.Params
+  alias Nexus.{Products, Devices}
+  alias Nexus.Devices.Device
+  alias NexusWeb.{Params, Tokens}
 
-  def post_metrics(conn, params) do
+  def post_metrics(conn, %{"metrics" => metrics} = params) do
     params_schema = [
       device_serial: %{type: :string, required: true},
       product_slug: %{type: :string, required: true}
     ]
 
+    metrics = :erlang.list_to_binary(metrics)
+
     with {:ok, normalized} <- Params.normalize(params_schema, params),
          {:ok, token} <- get_token(conn),
-         %DeviceToken{} <- Devices.get_device_token_by_token(token) do
+         {:ok, product} <-
+           Products.verity_token_and_fetch_product(
+             normalized.product_slug,
+             token,
+             &Tokens.verify_product_token/1
+           ),
+         %Device{} = device <- Devices.get_device_by_serial_number(normalized.device_serial),
+         _ <-
+           Devices.import_metrics(device, metrics, product, type: :mbf_binary) do
       render(conn, "index.json")
     end
   end

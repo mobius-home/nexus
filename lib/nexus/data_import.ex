@@ -51,7 +51,7 @@ defmodule Nexus.DataImport do
   defp get_fields_from_metrics(metrics) do
     Enum.reduce(metrics, %{}, fn metric, fields ->
       field_name = parse_field_name(metric.name)
-      Map.put(fields, field_name, metric.value)
+      Map.put(fields, field_name, {metric.value, :float})
     end)
   end
 
