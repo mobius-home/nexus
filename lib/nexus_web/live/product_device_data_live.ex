@@ -37,6 +37,7 @@ defmodule NexusWeb.ProductDeviceDataLive do
       |> assign(:data_series, DataSeries.empty())
       |> assign(:data_series_payload, nil)
       |> assign(:last_data_fetched_at, nil)
+      |> assign(:force_fields, false)
       |> allow_upload(:metrics, accept: ~w(.mbf .json), max_entries: 1)
 
     {:ok, socket}
@@ -62,6 +63,7 @@ defmodule NexusWeb.ProductDeviceDataLive do
 
   defp maybe_fetch_data(socket, opts \\ []) do
     query_params = socket.assigns.query_params
+    opts = Keyword.merge(opts, force_fields: socket.assigns.force_fields)
 
     case which_data(socket.assigns, opts) do
       :none ->
@@ -71,9 +73,20 @@ defmodule NexusWeb.ProductDeviceDataLive do
         {:ok, fields} =
           Products.get_measurement_fields(socket.assigns.product, query_params[:measurement])
 
+        socket
+        |> assign(:measurement_fields, fields)
+        |> maybe_fetch_data()
+
+      :force_fields ->
+        {:ok, fields} =
+          Products.get_measurement_fields(socket.assigns.product, query_params[:measurement])
+
         socket = assign(socket, :measurement_fields, fields)
 
-        maybe_fetch_data(socket)
+        socket
+        |> assign(:force_fields, false)
+        |> assign(:data_series, DataSeries.empty())
+        |> assign(:data_series_payload, nil)
 
       :measurement_data ->
         {_, now} = window = get_query_window(socket)
@@ -140,8 +153,12 @@ defmodule NexusWeb.ProductDeviceDataLive do
          opts
        ) do
     refresh = opts[:refresh] || false
+    force_fields = opts[:force_fields] || false
 
     cond do
+      force_fields ->
+        :force_fields
+
       query_params[:measurement] && !query_params[:field] && Enum.empty?(fields) ->
         :fields
 
@@ -198,7 +215,10 @@ defmodule NexusWeb.ProductDeviceDataLive do
 
     case Params.normalize(schema, params) do
       {:ok, normalized} ->
-        socket = update_query_params(socket, %{measurement: normalized.measurement})
+        socket =
+          socket
+          |> update_query_params(%{measurement: normalized.measurement})
+          |> assign(:force_fields, true)
 
         {:noreply,
          push_patch(socket,
