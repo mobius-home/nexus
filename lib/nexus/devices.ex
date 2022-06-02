@@ -6,7 +6,7 @@ defmodule Nexus.Devices do
   import Ecto.Query
 
   alias Nexus.{DataSeries, Influx, Repo}
-  alias Nexus.Devices.{Device, DeviceToken}
+  alias Nexus.Devices.Device
   alias Nexus.Products.ProductSettings
 
   @type get_data_opt() ::
@@ -88,33 +88,6 @@ defmodule Nexus.Devices do
   end
 
   @doc """
-  Get the device's token
-  """
-  @spec get_token(Device.t()) :: DeviceToken.t()
-  def get_token(device) do
-    query =
-      from dt in DeviceToken,
-        join: u in assoc(dt, :user),
-        where: u.id == dt.user_id,
-        where: dt.device_id == ^device.id,
-        preload: [user: u]
-
-    Repo.one(query)
-  end
-
-  @doc """
-  Delete the token for the device
-  """
-  @spec delete_token(Device.t()) :: :ok
-  def delete_token(device) do
-    query = from dt in DeviceToken, where: dt.device_id == ^device.id
-
-    _ = Repo.delete_all(query)
-
-    :ok
-  end
-
-  @doc """
   Import metrics for a device
 
   Nexus has first class for the Mobius Binary Format produced by the the
@@ -152,28 +125,7 @@ defmodule Nexus.Devices do
     binary
   end
 
-  def get_device_token_by_token(token) do
-    query =
-      from dt in DeviceToken,
-        join: d in assoc(dt, :device),
-        where: dt.device_id == d.id,
-        where: dt.token == ^token,
-        preload: [device: d]
-
-    case Repo.one(query) do
-      %DeviceToken{} = dt ->
-        :ok = update_device_token_last_used(dt)
-        dt
-    end
-  end
-
-  defp update_device_token_last_used(device_token) do
-    query =
-      from dt in DeviceToken,
-        where: dt.token == ^device_token.token
-
-    {1, _} = Repo.update_all(query, set: [last_used: NaiveDateTime.utc_now()])
-
+  def scrape_metrics() do
     :ok
   end
 end
