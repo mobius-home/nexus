@@ -5,8 +5,6 @@ defmodule NexusWeb.ProductDeviceSettingsLive do
 
   use NexusWeb, :surface_view
 
-  alias Nexus.{Accounts, Devices}
-  alias Nexus.Accounts.User
   alias NexusWeb.Components.DeviceViewContainer
 
   on_mount NexusWeb.UserLiveAuth
@@ -17,6 +15,7 @@ defmodule NexusWeb.ProductDeviceSettingsLive do
   end
 
   def handle_event("scrape-metrics", _params, socket) do
+    IO.inspect("Future feature support")
     {:noreply, socket}
   end
 
@@ -31,7 +30,8 @@ defmodule NexusWeb.ProductDeviceSettingsLive do
     >
       <button
         class="text-violet-600 border border-violet-600 py-2 px-5 rounded font-light hover:bg-violet-600 hover:text-white h-[42px]"
-        phx-click="scrape-metrics">
+        phx-click="scrape-metrics"
+      >
         Scrape Metrics
       </button>
     </DeviceViewContainer>

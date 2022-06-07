@@ -124,8 +124,4 @@ defmodule Nexus.Devices do
   defp get_mbf(:mbf_binary, binary) do
     binary
   end
-
-  def scrape_metrics() do
-    :ok
-  end
 end
