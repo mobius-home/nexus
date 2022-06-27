@@ -45,6 +45,7 @@ defmodule NexusWeb.Router do
       live "/:product_slug/measurements", ProductMeasurementsLive
 
       live "/:product_slug/settings", ProductSettingsLive
+      live "/:product_slug/delete", ProductSettingsLive, :delete_product
 
       live "/:product_slug/devices/:device_slug", ProductDeviceLive
       live "/:product_slug/devices/:device_slug/settings", ProductDeviceSettingsLive

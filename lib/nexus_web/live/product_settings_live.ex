@@ -2,8 +2,10 @@ defmodule NexusWeb.ProductSettingsLive do
   use NexusWeb, :surface_view
 
   alias Nexus.{Accounts, Products}
-  alias NexusWeb.Components.ProductViewContainer
-  alias NexusWeb.{GetResourceLive, Tokens}
+  alias Nexus.Products.Product
+  alias NexusWeb.Components.{ProductViewContainer, ModalForm}
+  alias NexusWeb.Components.Form.TextInput
+  alias NexusWeb.{GetResourceLive, Params, Tokens}
 
   on_mount NexusWeb.UserLiveAuth
   on_mount {GetResourceLive, :product}
@@ -15,8 +17,13 @@ defmodule NexusWeb.ProductSettingsLive do
       socket
       |> assign(:generated_token, nil)
       |> assign(:token, token)
+      |> assign(:delete_product_errors, [])
 
     {:ok, socket}
+  end
+
+  def handle_params(_params, _url, socket) do
+    {:noreply, socket}
   end
 
   def handle_event("generate-token", _params, socket) do
@@ -53,6 +60,45 @@ defmodule NexusWeb.ProductSettingsLive do
       |> assign(:generated_token, nil)
 
     {:noreply, socket}
+  end
+
+  def handle_event("delete-product", _params, socket) do
+    # this would probably be handle by AlpineJS better
+    socket =
+      push_patch(socket, to: Routes.product_settings_path(socket, :delete_product, socket.assigns.product.slug))
+
+    {:noreply, socket}
+  end
+
+  def handle_event("confirm-delete", %{"delete_product" => params}, socket) do
+    schema = [
+      product_name: %{type: :string, required: true}
+    ]
+
+    with {:ok, normalized} <- Params.normalize(schema, params),
+         :ok <- try_delete_product(normalized, socket) do
+        {:noreply, push_redirect(socket, to: Routes.live_path(socket, NexusWeb.ProductsLive))}
+         else
+        {:error, socket} ->
+          {:noreply, socket}
+         end
+
+  end
+
+  defp try_delete_product(%{product_name: product_name}, %{assigns: %{product: %Product{name: product_name}}} = socket) do
+    # above pattern match will ensure the provided product name and the actual
+    # product name are the same
+    case Products.delete_product_by_id(socket.assigns.product.id) do
+      :ok ->
+        :ok
+    end
+  end
+
+  defp try_delete_product(_schema, socket) do
+    errors =
+      [product_name: {"name does not match", []}]
+
+    {:error, assign(socket, :delete_product_errors, errors)}
   end
 
   defp get_token_creator(token) do
@@ -100,7 +146,37 @@ defmodule NexusWeb.ProductSettingsLive do
           </tbody>
         </table>
       {#else}
-        <button phx-click="generate-token">Generate token</button>
+        <h3 class="text-lg">Generate a new token</h3>
+        <p class="text-sm mt-1 text-gray-600">
+          You will only be shown the newly generated token once, be sure to copy it down somewhere safe
+        </p>
+        <button class="mt-4 border border-violet-300 rounded py-1 px-3" phx-click="generate-token">Generate token</button>
+      {/if}
+
+      <div class="mt-6">
+        <h3 class="text-lg">Delete product</h3>
+        <p class="text-sm mt-1 text-gray-600">
+          Once you delete you product you will lose all data
+        </p>
+        <button
+          class="mt-4 bg-red-200 border border-red-300 text-red-600 rounded py-1 px-3"
+          phx-click="delete-product"
+        >
+          Delete product
+        </button>
+      </div>
+
+      {#if @live_action == :delete_product}
+        <ModalForm
+         id={:delete_modal}
+         title="Delete product"
+         return_to={Routes.live_path(@socket, NexusWeb.ProductSettingsLive, @product.slug)}
+         for={:delete_product}
+         submit="confirm-delete"
+         errors={@delete_product_errors}
+        >
+          <TextInput field_name={:product_name} placeholder="Product name" />
+        </ModalForm>
       {/if}
     </ProductViewContainer>
     """
