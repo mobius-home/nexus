@@ -6,7 +6,7 @@ defmodule Nexus.MixProject do
   def project do
     [
       app: :nexus,
-      version: "0.1.0",
+      version: @version,
       elixir: "~> 1.12",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: [:gettext] ++ Mix.compilers() ++ [:surface],
@@ -55,13 +55,16 @@ defmodule Nexus.MixProject do
       {:plug_cowboy, "~> 2.5"},
       {:surface, "~> 0.7.1"},
       {:mobius, "~> 0.5.0"},
-      {:influx_ex, "~> 0.2.1"},
+      {:influx_ex, "~> 0.3.0"},
       {:req, "~> 0.2.2"},
       {:nimble_csv, "~> 1.0"},
       # Dev deps
       {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
       {:ex_doc, "~> 0.27", only: :docs, runtime: false},
-      {:credo, "~> 1.6", only: [:dev, :test], runtime: false}
+      {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
+      ## asset deps
+      {:tailwind, "~> 0.1", runtime: Mix.env() == :dev},
+      {:dart_sass, "~> 0.5", runtime: Mix.env() == :dev}
     ]
   end
 
@@ -73,7 +76,7 @@ defmodule Nexus.MixProject do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      setup: ["deps.get", "ecto.setup"],
+      setup: ["deps.get", "ecto.setup", "assets.biuld"],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: [
@@ -82,9 +85,15 @@ defmodule Nexus.MixProject do
         "run priv/repo/test_seeds.exs",
         "test"
       ],
+      "assets.build": [
+        "esbuild default",
+        "sass default",
+        "tailwind default"
+      ],
       "assets.deploy": [
-        "cmd --cd assets npm run deploy",
         "esbuild default --minify",
+        "sass default",
+        "tailwind default --minify",
         "phx.digest"
       ]
     ]

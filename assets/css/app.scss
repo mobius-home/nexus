@@ -1,0 +1,14 @@
+/*
+
+Thank you Mike Clark for this awesome article that helped get started with
+tailwind and Phoenix 1.6:
+ https://pragmaticstudio.com/tutorials/adding-tailwind-css-to-phoenix
+*/
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.min-h-100-85 {
+  min-height: calc(100vh - 85px);
+}

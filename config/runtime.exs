@@ -55,6 +55,37 @@ if config_env() == :prod do
     ],
     secret_key_base: secret_key_base
 
+  influx_token =
+    System.get_env("INFLUX_TOKEN") ||
+      raise """
+      environment variable INFLUX_TOKEN is missing.
+      """
+
+  influx_host =
+    System.get_env("INFLUX_HOST") ||
+      raise """
+      environment variable INFLUX_HOST is missing.
+      """
+
+  influx_org =
+    System.get_env("INFLUX_ORG") ||
+      raise """
+      environment variable INFLUX_ORG is missing.
+      """
+
+  influx_org_id =
+    System.get_env("INFLUX_ORG_ID") ||
+      raise """
+      environment variable INFLUX_ORG_id is missing.
+      """
+
+  config :nexus, :influx,
+    host: influx_host,
+    token: influx_token,
+    org: influx_org,
+    org_id: influx_org_id,
+    port: ""
+
   # ## Using releases
   #
   # If you are doing OTP releases, you need to instruct Phoenix

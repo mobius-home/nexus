@@ -26,7 +26,7 @@ defmodule Nexus.Influx do
   def create_bucket(bucket_name, opts \\ []) do
     with_client(
       fn client ->
-        Buckets.create(client, bucket_name)
+        Buckets.create(client, bucket_name, expires_in: {30, :days})
       end,
       opts
     )
@@ -159,118 +159,4 @@ defmodule Nexus.Influx do
 
     Client.new(token, client_opts)
   end
-
-  # @doc """
-  # Start the InfluxServer
-  # """
-  # @spec start_link(keyword()) :: GenServer.on_start()
-  # def start_link(args) do
-  #   GenServer.start_link(__MODULE__, args, name: __MODULE__)
-  # end
-
-  # @doc """
-  # Create a bucket
-  # """
-  # @spec create_bucket(binary()) ::
-  #         {:ok, Bucket.t()} | {:error, InfluxEx.error()}
-  # def create_bucket(bucket_name) do
-  #   GenServer.call(__MODULE__, {:create_bucket, bucket_name})
-  # end
-
-  # @doc """
-  # Delete a bucket
-  # """
-  # @spec delete_bucket(binary()) :: :ok | {:error, InfluxEx.error()}
-  # def delete_bucket(bucket_id) do
-  #   GenServer.call(__MODULE__, {:delete_bucket, bucket_id})
-  # end
-
-  # @doc """
-  # Get information about the bucket schema
-  # """
-  # @spec schema_info(binary(), schema_info_type()) :: {:ok, [binary()]}
-  # def schema_info(bucket, info_type) do
-  #   GenServer.call(__MODULE__, {:schema_info, bucket, info_type})
-  # end
-
-  # @doc """
-  # Write a list of data points (a series) to the server
-  # """
-  # @spec write_points(binary(), [Point.t()]) :: :ok | {:error, binary()}
-  # def write_points(bucket, points) do
-  #   GenServer.call(__MODULE__, {:write_points, bucket, points})
-  # end
-
-  # @doc """
-  # """
-  # def get_measurement_data_by_device_serial(device_serial, bucket, opts \\ []) do
-  #   GenServer.call(__MODULE__, {:get_measurement_data_by_device_serial, bucket, opts})
-  # end
-
-  # @impl GenServer
-  # def init(args) do
-  #   # required args
-  #   token = Keyword.fetch!(args, :token)
-  #   org = Keyword.fetch!(args, :org)
-
-  #   # optional args
-  #   port = Keyword.get(args, :port) || 8086
-  #   host = Keyword.get(args, :host) || "http://localhost"
-
-  #   client = Client.new(token, port: port, host: host, org: org)
-
-  #   case InfluxEx.orgs(client, org: org) do
-  #     {:ok, %{orgs: [org]}} ->
-  #       client = %{client | org_id: org.id}
-  #       {:ok, %{client: client}}
-
-  #     {:error, reason} ->
-  #       {:stop, reason}
-  #   end
-  # end
-
-  # @impl GenServer
-  # def handle_call({:create_bucket, bucket}, _from, state) do
-  #   case InfluxEx.create_bucket(state.client, bucket) do
-  #     {:ok, bucket} ->
-  #       {:reply, {:ok, bucket}, state}
-
-  #     error ->
-  #       {:reply, error, state}
-  #   end
-  # end
-
-  # def handle_call({:delete_bucket, bucket_id}, _from, state) do
-  #   case InfluxEx.delete_bucket(state.client, bucket_id) do
-  #     :ok ->
-  #       {:reply, :ok, state}
-
-  #     error ->
-  #       {:reply, error, state}
-  #   end
-  # end
-
-  # def handle_call({:schema_info, bucket, :measurements}, _from, state) do
-  #   result = SchemaInfo.get_measurements(state.client, bucket)
-
-  #   {:reply, result, state}
-  # end
-
-  # def handle_call({:schema_info, bucket, {:fields, measurement}}, _from, state) do
-  #   result = SchemaInfo.get_measurement_field_keys(state.client, bucket, measurement)
-
-  #   {:reply, result, state}
-  # end
-
-  # def handle_call({:write_points, bucket, points}, _from, state) do
-  #   # don't hardcode precision
-  #   result = InfluxEx.write(state.client, bucket, points, precision: :second)
-  #   {:reply, result, state}
-  # end
-
-  # def handle_call({:query, query}, _from, state) do
-  #   {:ok, tables} = InfluxEx.query(state.client, query)
-
-  #   {:reply, DataSeries.from_influx_tables(tables), state}
-  # end
 end
